@@ -20,7 +20,7 @@ export default defineConfig(({mode}) => {
   }
 
   return {
-    // base: '/grest_oppeano/', 
+    base: '/grest_oppeano/', 
     plugins: [react(), tailwindcss()],
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
