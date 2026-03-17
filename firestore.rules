@@ -1,0 +1,180 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Fields: uid, email, displayName, firstName, lastName, role, isManual, mustChangePassword, phone, createdAt
+    //
+    // Collection: registrations
+    // Fields: id, parentUid, childName, childSurname, birthDate, allergies, medicalNotes, status, paidGrestFee, createdAt
+    //
+    // Collection: events
+    // Fields: id, title, description, date, location, createdAt
+    //
+    // Collection: attendance
+    // Fields: registrationId, date, present, recordedAt
+    //
+    // Collection: surveys
+    // Fields: id, title, description, deadline, cost, departureTime, returnTime, minParticipants, active, createdAt
+    //
+    // Collection: surveyResponses
+    // Fields: surveyId, parentUid, registrationId, participating, paidTripFee, notes, respondedAt
+    //
+    // Collection: schedule
+    // Fields: id, time, activity, description, day, createdAt
+    //
+    // Collection: announcements
+    // Fields: id, title, content, type, createdAt
+    //
+    // Collection: legalContent
+    // Fields: id, type, content, updatedAt
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "dennisbottari@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isAnimator() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'animator';
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'role', 'createdAt']) &&
+             data.uid is string &&
+             data.role in ['admin', 'parent', 'animator'] &&
+             (data.email == null || isValidEmail(data.email)) &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidRegistration(data) {
+      return hasRequiredFields(['parentUid', 'childName', 'childSurname', 'birthDate', 'status', 'createdAt']) &&
+             data.parentUid is string &&
+             data.childName is string && data.childName.size() > 0 && data.childName.size() < 100 &&
+             data.childSurname is string && data.childSurname.size() > 0 && data.childSurname.size() < 100 &&
+             data.status in ['pending', 'confirmed', 'cancelled'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidSurveyResponse(data) {
+      return hasRequiredFields(['surveyId', 'parentUid', 'registrationId', 'participating', 'respondedAt']) &&
+             data.surveyId is string &&
+             data.parentUid is string &&
+             data.registrationId is string &&
+             data.participating is bool &&
+             data.respondedAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
+                    (request.resource.data.role == 'parent' || isAdmin());
+      allow update: if isAuthenticated() && (
+        (isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role) || 
+        isAdmin()
+      );
+    }
+
+    match /registrations/{regId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.parentUid || isAdmin() || isAnimator());
+      allow create: if isAuthenticated() && (request.auth.uid == request.resource.data.parentUid || isAdmin()) && isValidRegistration(request.resource.data);
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == resource.data.parentUid && isValidRegistration(request.resource.data) && 
+         request.resource.data.status == resource.data.status && request.resource.data.paidGrestFee == resource.data.paidGrestFee) || 
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /events/{eventId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin();
+    }
+
+    match /attendance/{attId} {
+      allow read: if isAdmin() || isAnimator();
+      allow write: if isAdmin() || isAnimator();
+    }
+
+    match /surveys/{surveyId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin();
+    }
+
+    match /surveyResponses/{respId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.parentUid || isAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.parentUid && isValidSurveyResponse(request.resource.data);
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == resource.data.parentUid && isValidSurveyResponse(request.resource.data) && 
+         request.resource.data.paidTripFee == resource.data.paidTripFee) || 
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /schedule/{itemId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin();
+    }
+
+    match /announcements/{annId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin();
+    }
+
+    match /legalContent/{contentId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin();
+    }
+
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // Default deny
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "parent", "animator"] },
+        "isManual": { "type": "boolean" },
+        "mustChangePassword": { "type": "boolean" },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "role", "createdAt"]
+    },
+    "Registration": {
+      "title": "Registration",
+      "description": "Child registration for Grest",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "parentUid": { "type": "string" },
+        "childName": { "type": "string" },
+        "childSurname": { "type": "string" },
+        "birthDate": { "type": "string", "format": "date" },
+        "allergies": { "type": "array", "items": { "type": "string" } },
+        "medicalNotes": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "paidGrestFee": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "parentUid", "childName", "childSurname", "birthDate", "status", "createdAt"]
+    },
+    "GrestEvent": {
+      "title": "GrestEvent",
+      "description": "Special events during Grest",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "location": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "date", "createdAt"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily attendance records",
+      "type": "object",
+      "properties": {
+        "registrationId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "present": { "type": "boolean" },
+        "recordedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["registrationId", "date", "present", "recordedAt"]
+    },
+    "Survey": {
+      "title": "Survey",
+      "description": "Surveys or trip registrations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "deadline": { "type": "string", "format": "date" },
+        "cost": { "type": "number" },
+        "departureTime": { "type": "string" },
+        "returnTime": { "type": "string" },
+        "minParticipants": { "type": "integer" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "active", "createdAt"]
+    },
+    "SurveyResponse": {
+      "title": "SurveyResponse",
+      "description": "Parent responses to surveys",
+      "type": "object",
+      "properties": {
+        "surveyId": { "type": "string" },
+        "parentUid": { "type": "string" },
+        "registrationId": { "type": "string" },
+        "participating": { "type": "boolean" },
+        "paidTripFee": { "type": "boolean" },
+        "notes": { "type": "string" },
+        "respondedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["surveyId", "parentUid", "registrationId", "participating", "respondedAt"]
+    },
+    "ScheduleItem": {
+      "title": "ScheduleItem",
+      "description": "Daily schedule items",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "time": { "type": "string" },
+        "activity": { "type": "string" },
+        "description": { "type": "string" },
+        "day": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "time", "activity", "day", "createdAt"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Public announcements",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "warning", "urgent"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "content", "type", "createdAt"]
+    },
+    "LegalContent": {
+      "title": "LegalContent",
+      "description": "Privacy policy and terms",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["privacy", "cookies", "terms"] },
+        "content": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "type", "content", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents"
+    },
+    "/registrations/{registrationId}": {
+      "schema": "Registration",
+      "description": "Child registration documents"
+    },
+    "/events/{eventId}": {
+      "schema": "GrestEvent",
+      "description": "Grest event documents"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Attendance record documents"
+    },
+    "/surveys/{surveyId}": {
+      "schema": "Survey",
+      "description": "Survey documents"
+    },
+    "/surveyResponses/{responseId}": {
+      "schema": "SurveyResponse",
+      "description": "Survey response documents"
+    },
+    "/schedule/{itemId}": {
+      "schema": "ScheduleItem",
+      "description": "Schedule item documents"
+    },
+    "/announcements/{announcementId}": {
+      "schema": "Announcement",
+      "description": "Announcement documents"
+    },
+    "/legalContent/{contentId}": {
+      "schema": "LegalContent",
+      "description": "Legal content documents"
+    }
+  }
+}
