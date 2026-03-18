@@ -36,6 +36,7 @@ import { auth, db, testConnection } from './firebase';
 import { UserProfile, Registration, GrestEvent, UserRole, Attendance, Survey, SurveyResponse, ScheduleItem, Announcement, LegalContent } from './types';
 import { COMMON_ALLERGIES } from './constants';
 import { 
+  Menu,
   LayoutDashboard, 
   UserCircle, 
   Calendar, 
@@ -199,61 +200,61 @@ const AdminDashboard: React.FC<{
   ];
 
   return (
-    <div className="space-y-12 p-6 md:p-12">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div className="space-y-4 md:space-y-12">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
         {stats.map((stat, i) => (
           <motion.div 
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-warm-bg p-8 rounded-[2.5rem] border border-warm-border hover:shadow-xl hover:shadow-warm-accent/5 transition-all group"
+            className="bg-warm-bg p-3 md:p-8 rounded-[1rem] md:rounded-[2.5rem] border border-warm-border hover:shadow-xl hover:shadow-warm-accent/5 transition-all group"
           >
-            <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center mb-6 border border-warm-border group-hover:scale-110 transition-transform duration-500`}>
-              <stat.icon className="w-7 h-7" />
+            <div className={`w-10 h-10 md:w-14 md:h-14 ${stat.bg} ${stat.color} rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-6 border border-warm-border group-hover:scale-110 transition-transform duration-500`}>
+              <stat.icon className="w-5 h-5 md:w-7 md:h-7" />
             </div>
-            <p className="text-warm-muted text-[10px] font-bold uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-            <p className="text-4xl font-bold text-warm-text font-serif italic">{stat.value}</p>
+            <p className="text-warm-muted text-[8px] md:text-[10px] font-bold uppercase tracking-[0.1em] md:tracking-[0.2em] mb-1 truncate">{stat.label}</p>
+            <p className="text-2xl md:text-4xl font-bold text-warm-text font-serif italic">{stat.value}</p>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div className="bg-warm-bg/50 p-10 rounded-[3rem] border border-warm-border">
-          <h4 className="text-2xl font-bold text-warm-text font-serif italic mb-8">Ultime Iscrizioni</h4>
-          <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-10">
+        <div className="bg-warm-bg/50 p-4 md:p-10 rounded-[1.5rem] md:rounded-[3rem] border border-warm-border">
+          <h4 className="text-lg md:text-2xl font-bold text-warm-text font-serif italic mb-4 md:mb-8">Ultime Iscrizioni</h4>
+          <div className="space-y-2 md:space-y-3">
             {registrations.slice(0, 5).map(reg => (
-              <div key={reg.id} className="flex items-center justify-between p-4 bg-warm-card rounded-2xl border border-warm-border shadow-sm">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-warm-accent/10 text-warm-accent rounded-xl flex items-center justify-center font-bold">
+              <div key={reg.id} className="flex items-center justify-between p-2 md:p-3 bg-warm-card rounded-xl md:rounded-2xl border border-warm-border shadow-sm gap-2">
+                <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                  <div className="w-7 h-7 md:w-10 md:h-10 bg-warm-accent/10 text-warm-accent rounded-lg md:rounded-xl flex items-center justify-center font-bold flex-shrink-0 text-[10px] md:text-base">
                     {reg.childName[0]}
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-warm-text">{reg.childName} {reg.childSurname}</p>
-                    <p className="text-[10px] text-warm-muted uppercase tracking-widest">{reg.status}</p>
+                  <div className="min-w-0">
+                    <p className="text-[10px] md:text-sm font-bold text-warm-text truncate">{reg.childName} {reg.childSurname}</p>
+                    <p className="text-[7px] md:text-[10px] text-warm-muted uppercase tracking-widest">{reg.status}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-bold text-warm-muted">{new Date(reg.createdAt.toDate()).toLocaleDateString('it-IT')}</p>
+                <div className="text-right shrink-0">
+                  <p className="text-[7px] md:text-[10px] font-bold text-warm-muted">{new Date(reg.createdAt.toDate()).toLocaleDateString('it-IT')}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-warm-bg/50 p-10 rounded-[3rem] border border-warm-border">
-          <h4 className="text-2xl font-bold text-warm-text font-serif italic mb-8">Stato Sondaggi</h4>
-          <div className="space-y-6">
+        <div className="bg-warm-bg/50 p-4 md:p-10 rounded-[1.5rem] md:rounded-[3rem] border border-warm-border">
+          <h4 className="text-lg md:text-2xl font-bold text-warm-text font-serif italic mb-4 md:mb-8">Stato Sondaggi</h4>
+          <div className="space-y-4 md:space-y-5">
             {surveys.slice(0, 3).map(survey => {
               const surveyResponses = responses.filter(r => r.surveyId === survey.id);
               const percentage = survey.minParticipants ? Math.min(100, (surveyResponses.length / survey.minParticipants) * 100) : 0;
               return (
-                <div key={survey.id} className="space-y-3">
+                <div key={survey.id} className="space-y-2 md:space-y-3">
                   <div className="flex justify-between items-end">
-                    <p className="text-sm font-bold text-warm-text">{survey.title}</p>
-                    <p className="text-[10px] font-bold text-warm-muted uppercase tracking-widest">{surveyResponses.length} / {survey.minParticipants || '∞'} Partecipanti</p>
+                    <p className="text-[11px] md:text-sm font-bold text-warm-text truncate max-w-[70%]">{survey.title}</p>
+                    <p className="text-[9px] md:text-[10px] font-bold text-warm-muted uppercase tracking-widest">{surveyResponses.length} / {survey.minParticipants || '∞'}</p>
                   </div>
-                  <div className="h-3 bg-warm-card rounded-full overflow-hidden border border-warm-border">
+                  <div className="h-1.5 md:h-2 bg-warm-bg rounded-full overflow-hidden border border-warm-border">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${percentage}%` }}
@@ -286,12 +287,12 @@ const AnnouncementManager: React.FC<{
   };
 
   return (
-    <div className="space-y-12 p-6 md:p-12">
-      <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Gestione Annunci</h3>
+    <div className="space-y-6 md:space-y-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h3 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic">Gestione Annunci</h3>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-lg ${isAdding ? 'bg-warm-bg text-warm-muted border border-warm-border' : 'bg-warm-accent text-white shadow-warm-accent/20 hover:scale-[1.02]'}`}
+          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-lg ${isAdding ? 'bg-warm-bg text-warm-muted border border-warm-border' : 'bg-warm-accent text-white shadow-warm-accent/20 hover:scale-[1.02]'}`}
         >
           {isAdding ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {isAdding ? 'Annulla' : 'Nuovo Annuncio'}
@@ -303,7 +304,7 @@ const AnnouncementManager: React.FC<{
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }} 
           onSubmit={handleSubmit}
-          className="bg-warm-bg p-8 rounded-[2.5rem] border border-warm-border space-y-6"
+          className="bg-warm-bg p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-warm-border space-y-6"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-3">
@@ -346,26 +347,28 @@ const AnnouncementManager: React.FC<{
         </motion.form>
       )}
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 md:gap-6">
         {announcements.map(ann => (
-          <div key={ann.id} className="p-6 bg-warm-card border border-warm-border rounded-[2rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex justify-between items-start">
-            <div className="flex gap-5">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${
+          <div key={ann.id} className="p-4 md:p-6 bg-warm-card border border-warm-border rounded-[1.5rem] md:rounded-[2rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex flex-col sm:flex-row justify-between items-start gap-4">
+            <div className="flex gap-4 md:gap-5">
+              <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center border flex-shrink-0 ${
                 ann.type === 'urgent' ? 'bg-red-50 text-red-500 border-red-100' :
                 ann.type === 'warning' ? 'bg-amber-50 text-amber-500 border-amber-100' :
                 'bg-emerald-50 text-emerald-500 border-emerald-100'
               }`}>
-                <Megaphone className="w-6 h-6" />
+                <Megaphone className="w-5 h-5 md:w-6 md:h-6" />
               </div>
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h4 className="font-bold text-lg text-warm-text">{ann.title}</h4>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted">{new Date(ann.createdAt.toDate()).toLocaleDateString('it-IT')}</span>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1">
+                  <h4 className="font-bold text-base md:text-lg text-warm-text truncate">{ann.title}</h4>
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-warm-muted">{new Date(ann.createdAt.toDate()).toLocaleDateString('it-IT')}</span>
                 </div>
-                <p className="text-warm-text/70 text-sm leading-relaxed font-sans">{ann.content}</p>
+                <p className="text-warm-text/70 text-xs md:text-sm leading-relaxed font-sans">{ann.content}</p>
               </div>
             </div>
-            <DeleteButton onDelete={() => onDelete(ann.id!)} />
+            <div className="w-full sm:w-auto flex justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-warm-border/50">
+              <DeleteButton onDelete={() => onDelete(ann.id!)} />
+            </div>
           </div>
         ))}
         {announcements.length === 0 && (
@@ -974,6 +977,25 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
+
+  interface AdminTabInfo {
+    id: 'dashboard' | 'registrations' | 'attendance' | 'surveys' | 'announcements' | 'schedule' | 'events' | 'users' | 'legal';
+    label: string;
+    icon: React.ReactNode;
+  }
+
+  const adminTabs: AdminTabInfo[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'registrations', label: 'Iscrizioni', icon: <Users className="w-4 h-4" /> },
+    { id: 'attendance', label: 'Presenze', icon: <CheckCircle className="w-4 h-4" /> },
+    { id: 'surveys', label: 'Sondaggi', icon: <Vote className="w-4 h-4" /> },
+    { id: 'announcements', label: 'Annunci', icon: <Megaphone className="w-4 h-4" /> },
+    { id: 'schedule', label: 'Orari', icon: <Timer className="w-4 h-4" /> },
+    { id: 'events', label: 'Eventi', icon: <Calendar className="w-4 h-4" /> },
+    { id: 'users', label: 'Utenti', icon: <UserCircle className="w-4 h-4" /> },
+    { id: 'legal', label: 'Legale', icon: <ShieldCheck className="w-4 h-4" /> },
+  ];
 
   useEffect(() => {
     testConnection();
@@ -1777,28 +1799,87 @@ export default function App() {
             )}
 
             {activeTab === 'admin' && profile?.role === 'admin' && (
-              <motion.div key="admin" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-10">
-                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 py-6">
+              <motion.div key="admin" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-6 md:space-y-10">
+                <div className="flex flex-col gap-8 py-4 md:py-8">
                   <div className="max-w-xl">
-                    <h2 className="text-4xl md:text-6xl font-bold text-warm-text font-serif italic mb-4 leading-none">Gestione <br/><span className="text-warm-accent">Creativa</span></h2>
-                    <p className="text-warm-muted font-sans tracking-wide text-base md:text-lg font-light">Un unico spazio per coordinare l'energia del Grest Oppeano.</p>
+                    <h2 className="text-3xl md:text-6xl font-bold text-warm-text font-serif italic mb-2 md:mb-4 leading-none">Gestione <br/><span className="text-warm-accent">Creativa</span></h2>
+                    <p className="text-warm-muted font-sans tracking-wide text-sm md:text-lg font-light">Un unico spazio per coordinare l'energia del Grest Oppeano.</p>
                   </div>
-                  <div className="flex overflow-x-auto pb-4 lg:pb-0 lg:flex-wrap gap-3 w-full lg:w-auto no-scrollbar scroll-smooth snap-x">
-                    <div className="snap-start"><AdminTab active={adminTab === 'dashboard'} onClick={() => setAdminTab('dashboard')} icon={<BarChart3 className="w-4 h-4" />} label="Dashboard" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'registrations'} onClick={() => setAdminTab('registrations')} icon={<Users className="w-4 h-4" />} label="Iscrizioni" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'attendance'} onClick={() => setAdminTab('attendance')} icon={<CheckCircle className="w-4 h-4" />} label="Presenze" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'surveys'} onClick={() => setAdminTab('surveys')} icon={<Vote className="w-4 h-4" />} label="Sondaggi" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'announcements'} onClick={() => setAdminTab('announcements')} icon={<Megaphone className="w-4 h-4" />} label="Annunci" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'schedule'} onClick={() => setAdminTab('schedule')} icon={<Timer className="w-4 h-4" />} label="Orari" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'events'} onClick={() => setAdminTab('events')} icon={<Calendar className="w-4 h-4" />} label="Eventi" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'users'} onClick={() => setAdminTab('users')} icon={<UserCircle className="w-4 h-4" />} label="Utenti" /></div>
-                    <div className="snap-start"><AdminTab active={adminTab === 'legal'} onClick={() => setAdminTab('legal')} icon={<ShieldCheck className="w-4 h-4" />} label="Legale" /></div>
+                  
+                  {/* Mobile Admin Menu Button - Improved positioning and style */}
+                  <div className="lg:hidden relative">
+                    <div className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mb-3 ml-2">Sezione Attiva</div>
+                    <button 
+                      onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+                      className="flex items-center justify-between w-full px-6 py-4 bg-white border border-warm-border rounded-2xl font-bold shadow-sm hover:shadow-md transition-all"
+                    >
+                      <div className="flex items-center gap-3 text-warm-text">
+                        <span className="text-warm-accent">
+                          {adminTabs.find(t => t.id === adminTab)?.icon}
+                        </span>
+                        <span className="font-serif italic text-lg">
+                          {adminTabs.find(t => t.id === adminTab)?.label}
+                        </span>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-warm-muted transition-transform duration-300 ${isAdminMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    <AnimatePresence>
+                      {isAdminMenuOpen && (
+                        <>
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsAdminMenuOpen(false)}
+                            className="fixed inset-0 z-[60] bg-stone-900/40"
+                          />
+                          <motion.div 
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="fixed inset-x-6 top-[15%] z-[70] bg-white rounded-[2.5rem] shadow-2xl border border-warm-border overflow-hidden p-6 max-w-sm mx-auto"
+                          >
+                            <div className="flex items-center justify-between mb-6 px-2">
+                              <h3 className="text-xl font-serif italic font-bold text-warm-text">Menu Admin</h3>
+                              <button onClick={() => setIsAdminMenuOpen(false)} className="p-2 hover:bg-warm-bg rounded-full transition-colors">
+                                <X className="w-5 h-5 text-warm-muted" />
+                              </button>
+                            </div>
+                            <div className="grid gap-2 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
+                              {adminTabs.map(tab => (
+                                <AdminMenuButton 
+                                  key={tab.id}
+                                  active={adminTab === tab.id} 
+                                  onClick={() => { setAdminTab(tab.id); setIsAdminMenuOpen(false); }} 
+                                  icon={tab.icon} 
+                                  label={tab.label} 
+                                />
+                              ))}
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Desktop Admin Tabs - Separate and clearly visible */}
+                  <div className="hidden lg:grid grid-cols-3 xl:grid-cols-5 gap-4 w-full">
+                    {adminTabs.map(tab => (
+                      <AdminTab 
+                        key={tab.id}
+                        active={adminTab === tab.id} 
+                        onClick={() => setAdminTab(tab.id)} 
+                        icon={React.cloneElement(tab.icon as React.ReactElement, { className: "w-5 h-5" })} 
+                        label={tab.label} 
+                      />
+                    ))}
                   </div>
                 </div>
 
                 <div className="bg-warm-card rounded-[3rem] border border-warm-border shadow-sm overflow-hidden min-h-[600px]">
                   {adminTab === 'dashboard' && (
-                    <div className="p-6 md:p-12">
+                    <div className="p-4 md:p-12">
                       <AdminDashboard 
                         registrations={allRegistrations} 
                         users={allUsers} 
@@ -1809,7 +1890,7 @@ export default function App() {
                   )}
 
                   {adminTab === 'announcements' && (
-                    <div className="p-6 md:p-12">
+                    <div className="p-4 md:p-12">
                       <AnnouncementManager 
                         announcements={announcements} 
                         onAdd={addAnnouncement} 
@@ -1818,40 +1899,40 @@ export default function App() {
                     </div>
                   )}
                   {adminTab === 'registrations' && (
-                    <div className="p-6 md:p-12 space-y-12">
+                    <div className="p-4 md:p-12 space-y-8 md:space-y-12">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Gestione Iscrizioni</h3>
-                        <div className="flex gap-3">
-                          <div className="px-4 py-2 bg-amber-50 text-amber-600 rounded-2xl text-[10px] font-bold border border-amber-100 flex items-center gap-2 uppercase tracking-widest">
-                            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                        <h3 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic">Gestione Iscrizioni</h3>
+                        <div className="flex gap-2 md:gap-3">
+                          <div className="px-3 py-1.5 md:px-4 md:py-2 bg-amber-50 text-amber-600 rounded-2xl text-[8px] md:text-[10px] font-bold border border-amber-100 flex items-center gap-1.5 md:gap-2 uppercase tracking-widest">
+                            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-amber-500 rounded-full animate-pulse" />
                             {allRegistrations.filter(r => r.status === 'pending').length} In sospeso
                           </div>
-                          <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-2xl text-[10px] font-bold border border-emerald-100 flex items-center gap-2 uppercase tracking-widest">
-                            <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                          <div className="px-3 py-1.5 md:px-4 md:py-2 bg-emerald-50 text-emerald-600 rounded-2xl text-[8px] md:text-[10px] font-bold border border-emerald-100 flex items-center gap-1.5 md:gap-2 uppercase tracking-widest">
+                            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full" />
                             {allRegistrations.filter(r => r.status === 'confirmed').length} Confermate
                           </div>
                         </div>
                       </div>
-                      <div className="grid gap-6">
+                      <div className="grid gap-4 md:gap-6">
                         {allRegistrations.map(reg => (
-                          <div key={reg.id} className="p-5 md:p-8 bg-warm-card border border-warm-border rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group overflow-hidden">
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                              <div className="flex flex-col sm:flex-row gap-6">
-                                <div className="w-16 h-16 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-2xl group-hover:bg-warm-accent group-hover:text-white transition-all duration-500 border border-warm-border shrink-0 mx-auto sm:mx-0">
+                          <div key={reg.id} className="p-4 md:p-8 bg-warm-card border border-warm-border rounded-[1.5rem] md:rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group overflow-hidden">
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-8">
+                              <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
+                                <div className="w-14 h-14 md:w-16 md:h-16 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-xl md:text-2xl group-hover:bg-warm-accent group-hover:text-white transition-all duration-500 border border-warm-border shrink-0 mx-auto sm:mx-0">
                                   {reg.childName[0]}{reg.childSurname[0]}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-bold text-2xl text-warm-text text-center sm:text-left truncate">{reg.childName} {reg.childSurname}</p>
-                                  <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted flex items-center gap-2 bg-warm-bg px-3 py-2 rounded-xl border border-warm-border">
-                                      <Calendar className="w-4 h-4 text-warm-accent/40" /> {new Date(reg.birthDate).toLocaleDateString('it-IT')}
+                                  <p className="font-bold text-xl md:text-2xl text-warm-text text-center sm:text-left truncate">{reg.childName} {reg.childSurname}</p>
+                                  <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 md:gap-2 mt-3 md:mt-4">
+                                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-warm-muted flex items-center gap-1.5 md:gap-2 bg-warm-bg px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl border border-warm-border">
+                                      <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-warm-accent/40" /> {new Date(reg.birthDate).toLocaleDateString('it-IT')}
                                     </span>
-                                    <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-xl border flex items-center gap-2 ${
+                                    <span className={`text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl border flex items-center gap-1.5 md:gap-2 ${
                                       reg.status === 'confirmed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
                                       reg.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
                                       'bg-red-50 text-red-600 border-red-100'
                                     }`}>
-                                      <div className={`w-1.5 h-1.5 rounded-full ${
+                                      <div className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${
                                         reg.status === 'confirmed' ? 'bg-emerald-500' : 
                                         reg.status === 'pending' ? 'bg-amber-500' : 
                                         'bg-red-500'
@@ -1860,50 +1941,50 @@ export default function App() {
                                     </span>
                                     <button 
                                       onClick={() => toggleGrestPayment(reg.id, !!reg.paidGrestFee)}
-                                      className={`text-[10px] font-bold px-3 py-2 rounded-xl flex items-center gap-2 transition-all border ${
+                                      className={`text-[9px] md:text-[10px] font-bold px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl flex items-center gap-1.5 md:gap-2 transition-all border ${
                                         reg.paidGrestFee ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100' : 'bg-red-50 text-red-700 border-red-100 hover:bg-red-100'
                                       }`}
                                     >
-                                      <CreditCard className="w-4 h-4" />
+                                      <CreditCard className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                       {reg.paidGrestFee ? 'Quota Pagata' : 'Quota Non Pagata'}
                                     </button>
                                   </div>
                                   {(reg.allergies && reg.allergies.length > 0) && (
-                                    <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mt-4">
+                                    <div className="flex flex-wrap justify-center sm:justify-start gap-1 mt-3 md:mt-4">
                                       {reg.allergies.map(a => (
-                                        <span key={a} className="px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[9px] font-bold uppercase tracking-tight">
+                                        <span key={a} className="px-2 py-0.5 md:px-2.5 md:py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[8px] md:text-[9px] font-bold uppercase tracking-tight">
                                           {a}
                                         </span>
                                       ))}
                                     </div>
                                   )}
                                   {reg.medicalNotes && (
-                                    <div className="mt-4 p-3 bg-warm-bg/50 rounded-xl border border-warm-border/50">
-                                      <p className="text-[10px] text-warm-muted italic font-sans break-words">
-                                        <Info className="w-3.5 h-3.5 inline mr-1.5 opacity-50" /> {reg.medicalNotes}
+                                    <div className="mt-3 md:mt-4 p-2.5 md:p-3 bg-warm-bg/50 rounded-xl border border-warm-border/50">
+                                      <p className="text-[9px] md:text-[10px] text-warm-muted italic font-sans break-words">
+                                        <Info className="w-3 md:w-3.5 h-3 md:h-3.5 inline mr-1 md:mr-1.5 opacity-50" /> {reg.medicalNotes}
                                       </p>
                                     </div>
                                   )}
                                 </div>
                               </div>
-                              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 pt-6 lg:pt-0 border-t lg:border-t-0 border-warm-border/50">
-                                <button onClick={() => setEditingRegistration(reg)} className="p-4 bg-warm-bg text-warm-muted rounded-2xl hover:bg-warm-accent hover:text-white transition-all shadow-sm border border-warm-border" title="Modifica">
-                                  <Edit2 className="w-6 h-6" />
+                              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2 md:gap-3 pt-4 md:pt-6 lg:pt-0 border-t lg:border-t-0 border-warm-border/50">
+                                <button onClick={() => setEditingRegistration(reg)} className="p-3 md:p-4 bg-warm-bg text-warm-muted rounded-2xl hover:bg-warm-accent hover:text-white transition-all shadow-sm border border-warm-border" title="Modifica">
+                                  <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
                                 </button>
                                 {reg.status === 'pending' && (
-                                  <button onClick={() => updateRegistrationStatus(reg.id, 'confirmed')} className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm border border-emerald-100" title="Conferma">
-                                    <Check className="w-6 h-6" />
+                                  <button onClick={() => updateRegistrationStatus(reg.id, 'confirmed')} className="p-3 md:p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm border border-emerald-100" title="Conferma">
+                                    <Check className="w-5 h-5 md:w-6 md:h-6" />
                                   </button>
                                 )}
                                 <LinkParentButton registration={reg} users={allUsers} onLink={linkRegistrationToParent} />
-                                <DeleteButton onDelete={() => deleteEntity('registrations', reg.id)} className="bg-red-50 p-4" />
+                                <DeleteButton onDelete={() => deleteEntity('registrations', reg.id)} className="bg-red-50 p-3 md:p-4" />
                               </div>
                             </div>
                           </div>
                         ))}
                         {allRegistrations.length === 0 && (
-                          <div className="py-32 text-center bg-warm-bg rounded-[3rem] border-2 border-dashed border-warm-border">
-                            <Users className="w-16 h-16 text-warm-muted/30 mx-auto mb-4" />
+                          <div className="py-20 md:py-32 text-center bg-warm-bg rounded-[2rem] md:rounded-[3rem] border-2 border-dashed border-warm-border">
+                            <Users className="w-12 h-12 md:w-16 md:h-16 text-warm-muted/30 mx-auto mb-4" />
                             <p className="text-warm-muted italic font-serif">Nessuna iscrizione registrata.</p>
                           </div>
                         )}
@@ -1912,23 +1993,23 @@ export default function App() {
                   )}
 
                   {adminTab === 'attendance' && (
-                    <div className="p-6 md:p-12 space-y-12">
-                      <div className="flex justify-between items-center">
-                        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Presenze di Oggi</h3>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-warm-bg border border-warm-border rounded-2xl text-[10px] font-bold uppercase tracking-widest text-warm-muted">
+                    <div className="p-4 md:p-12 space-y-8 md:space-y-12">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h3 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic">Presenze di Oggi</h3>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-warm-bg border border-warm-border rounded-2xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-warm-muted">
                           <Calendar className="w-4 h-4 text-warm-accent/40" />
                           {new Date().toLocaleDateString('it-IT')}
                         </div>
                       </div>
-                      <div className="grid gap-4">
+                      <div className="grid gap-3 md:gap-4">
                         {allRegistrations.filter(r => r.status === 'confirmed').map(reg => {
                           const isPresent = attendance.find(a => a.registrationId === reg.id)?.present;
                           return (
-                            <div key={reg.id} className="p-5 bg-warm-card border border-warm-border rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 hover:shadow-lg hover:shadow-warm-accent/5 transition-all group">
-                              <p className="font-bold text-warm-text text-lg font-serif italic">{reg.childName} {reg.childSurname}</p>
+                            <div key={reg.id} className="p-4 md:p-5 bg-warm-card border border-warm-border rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 hover:shadow-lg hover:shadow-warm-accent/5 transition-all group">
+                              <p className="font-bold text-warm-text text-base md:text-lg font-serif italic">{reg.childName} {reg.childSurname}</p>
                               <button 
                                 onClick={() => toggleAttendance(reg.id)} 
-                                className={`w-full sm:w-auto px-8 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg ${isPresent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-warm-bg text-warm-muted border border-warm-border hover:bg-warm-accent/5'}`}
+                                className={`w-full sm:w-auto px-8 py-3 rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg ${isPresent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-warm-bg text-warm-muted border border-warm-border hover:bg-warm-accent/5'}`}
                               >
                                 {isPresent ? 'Presente' : 'Assente'}
                               </button>
@@ -1936,7 +2017,7 @@ export default function App() {
                           );
                         })}
                         {allRegistrations.filter(r => r.status === 'confirmed').length === 0 && (
-                          <div className="py-20 text-center bg-warm-bg rounded-[2rem] border-2 border-dashed border-warm-border">
+                          <div className="py-20 text-center bg-warm-bg rounded-[2rem] md:rounded-[3rem] border-2 border-dashed border-warm-border">
                             <p className="text-warm-muted italic font-serif">Nessun partecipante confermato.</p>
                           </div>
                         )}
@@ -1945,64 +2026,64 @@ export default function App() {
                   )}
 
                   {adminTab === 'surveys' && (
-                    <div className="p-6 md:p-12 space-y-12">
-                      <div className="space-y-10">
-                        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Risultati Sondaggi</h3>
-                        <div className="grid gap-8">
+                    <div className="p-4 md:p-12 space-y-8 md:space-y-12">
+                      <div className="space-y-6 md:space-y-10">
+                        <h3 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic">Risultati Sondaggi</h3>
+                        <div className="grid gap-6 md:gap-8">
                           {surveys.map(survey => {
                             const responses = allSurveyResponses.filter(r => r.surveyId === survey.id);
                             const participants = responses.filter(r => r.participating);
                             return (
-                              <div key={survey.id} className="bg-warm-card p-8 rounded-[2.5rem] border border-warm-border shadow-sm group">
+                              <div key={survey.id} className="bg-warm-card p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-warm-border shadow-sm group">
                                 <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-4 mb-3">
-                                      <h4 className="font-bold text-2xl text-warm-text">{survey.title}</h4>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex flex-wrap items-center gap-3 mb-3">
+                                      <h4 className="font-bold text-xl md:text-2xl text-warm-text truncate">{survey.title}</h4>
                                       <button 
                                         onClick={() => updateEntity('surveys', survey.id, { active: !survey.active })}
-                                        className={`text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full transition-all ${survey.active ? 'bg-emerald-100 text-emerald-700' : 'bg-warm-bg text-warm-muted border border-warm-border'}`}
+                                        className={`text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full transition-all ${survey.active ? 'bg-emerald-100 text-emerald-700' : 'bg-warm-bg text-warm-muted border border-warm-border'}`}
                                       >
                                         {survey.active ? 'Attivo' : 'Archiviato'}
                                       </button>
                                     </div>
-                                    <p className="text-warm-text/70 leading-relaxed font-sans">{survey.description}</p>
+                                    <p className="text-warm-text/70 leading-relaxed font-sans text-sm md:text-base">{survey.description}</p>
                                     {survey.minParticipants && (
                                       <div className="mt-6 flex items-center gap-4">
-                                        <div className="w-48 h-2.5 bg-warm-bg rounded-full overflow-hidden border border-warm-border">
+                                        <div className="w-32 md:w-48 h-2.5 bg-warm-bg rounded-full overflow-hidden border border-warm-border">
                                           <div 
                                             className={`h-full transition-all duration-700 ${participants.length >= survey.minParticipants ? 'bg-emerald-500' : 'bg-warm-accent'}`}
                                             style={{ width: `${Math.min(100, (participants.length / survey.minParticipants) * 100)}%` }}
                                           />
                                         </div>
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${participants.length >= survey.minParticipants ? 'text-emerald-600' : 'text-warm-accent'}`}>
-                                          {participants.length}/{survey.minParticipants} {participants.length >= survey.minParticipants ? 'Confermata' : 'In attesa'}
+                                        <span className={`text-[9px] md:text-[10px] font-bold uppercase tracking-widest ${participants.length >= survey.minParticipants ? 'text-emerald-600' : 'text-warm-accent'}`}>
+                                          {participants.length}/{survey.minParticipants}
                                         </span>
                                       </div>
                                     )}
                                   </div>
-                                  <div className="flex flex-col items-end gap-4">
-                                    <div className="text-right">
-                                      <p className="text-5xl font-bold text-warm-text font-serif italic">{participants.length}</p>
-                                      <p className="text-[10px] uppercase font-bold text-warm-muted tracking-[0.2em]">Adesioni</p>
+                                  <div className="flex flex-row md:flex-col items-center md:items-end gap-4 w-full md:w-auto justify-between md:justify-start border-t md:border-t-0 pt-4 md:pt-0 border-warm-border/50">
+                                    <div className="md:text-right">
+                                      <p className="text-3xl md:text-5xl font-bold text-warm-text font-serif italic">{participants.length}</p>
+                                      <p className="text-[9px] md:text-[10px] uppercase font-bold text-warm-muted tracking-[0.2em]">Adesioni</p>
                                     </div>
                                     <DeleteButton onDelete={() => deleteEntity('surveys', survey.id)} />
                                   </div>
                                 </div>
-                                <div className="space-y-4 pt-8 border-t border-warm-border">
-                                  <p className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em]">Dettaglio Partecipanti</p>
+                                <div className="space-y-4 pt-6 md:pt-8 border-t border-warm-border">
+                                  <p className="text-[9px] md:text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em]">Dettaglio Partecipanti</p>
                                   {participants.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                       {participants.map(p => {
                                         const reg = allRegistrations.find(r => r.id === p.registrationId);
                                         return (
-                                          <div key={p.id} className="flex flex-col sm:flex-row items-center justify-between p-4 bg-warm-bg rounded-2xl border border-warm-border group/item hover:border-warm-accent/30 transition-all gap-3">
+                                          <div key={p.id} className="flex flex-col sm:flex-row items-center justify-between p-3 md:p-4 bg-warm-bg rounded-2xl border border-warm-border group/item hover:border-warm-accent/30 transition-all gap-3">
                                             <span className="text-xs font-bold text-warm-text truncate max-w-full">
                                               {reg ? `${reg.childName} ${reg.childSurname}` : 'Sconosciuto'}
                                             </span>
                                             <div className="flex items-center gap-2 w-full sm:w-auto justify-center">
                                               <button 
                                                 onClick={() => toggleTripPayment(p.id!, !!p.paidTripFee)}
-                                                className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all border ${p.paidTripFee ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}
+                                                className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-[8px] md:text-[9px] font-bold uppercase tracking-widest transition-all border ${p.paidTripFee ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}
                                               >
                                                 {p.paidTripFee ? 'Pagato' : 'No'}
                                               </button>
@@ -2021,9 +2102,9 @@ export default function App() {
                           })}
                         </div>
                       </div>
-                      <div className="pt-12 border-t border-warm-border">
-                        <h3 className="text-2xl font-bold mb-8 text-warm-text font-serif italic">Crea Nuovo Sondaggio</h3>
-                        <div className="bg-warm-bg p-6 md:p-10 rounded-[2rem] border border-warm-border">
+                      <div className="pt-8 md:pt-12 border-t border-warm-border">
+                        <h3 className="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-warm-text font-serif italic">Crea Nuovo Sondaggio</h3>
+                        <div className="bg-warm-bg p-5 md:p-10 rounded-[1.5rem] md:rounded-[2rem] border border-warm-border">
                           <SurveyForm />
                         </div>
                       </div>
@@ -2031,32 +2112,32 @@ export default function App() {
                   )}
 
                   {adminTab === 'schedule' && (
-                    <div className="p-6 md:p-12 space-y-12">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Gestione Orari</h3>
-                        <div className="px-4 py-2 bg-warm-bg border border-warm-border rounded-2xl text-[10px] font-bold uppercase tracking-widest text-warm-muted">
-                          {schedule.length} Attività in Programma
+                    <div className="p-4 md:p-12 space-y-8 md:space-y-12">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <h3 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic">Gestione Orari</h3>
+                        <div className="px-4 py-2 bg-warm-bg border border-warm-border rounded-2xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-warm-muted">
+                          {schedule.length} Attività
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        <div className="space-y-6">
-                          <p className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mb-4">Programma Attuale</p>
-                          <div className="grid gap-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                        <div className="space-y-4 md:space-y-6">
+                          <p className="text-[9px] md:text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mb-4">Programma Attuale</p>
+                          <div className="grid gap-3 md:gap-4">
                             {schedule.map(item => (
-                              <div key={item.id} className="p-6 bg-warm-card border border-warm-border rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex flex-col sm:flex-row items-center justify-between gap-6">
-                                <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left w-full">
-                                  <div className="w-24 h-16 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-xl border border-warm-border group-hover:bg-warm-accent group-hover:text-white transition-all duration-500 shrink-0">
+                              <div key={item.id} className="p-4 md:p-6 bg-warm-card border border-warm-border rounded-[1.5rem] md:rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex flex-col sm:flex-row items-center justify-between gap-4 md:gap-6">
+                                <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 text-center sm:text-left w-full">
+                                  <div className="w-20 h-14 md:w-24 md:h-16 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-lg md:text-xl border border-warm-border group-hover:bg-warm-accent group-hover:text-white transition-all duration-500 shrink-0">
                                     {item.time}
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <p className="font-bold text-warm-text text-xl font-serif italic">{item.activity}</p>
-                                    <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 mt-2">
-                                      <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted bg-warm-bg px-3 py-1.5 rounded-xl border border-warm-border">{item.day}</span>
-                                      {item.description && <p className="text-xs text-warm-muted italic font-serif truncate max-w-[200px]">— {item.description}</p>}
+                                    <p className="font-bold text-warm-text text-base md:text-xl font-serif italic truncate">{item.activity}</p>
+                                    <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 mt-2">
+                                      <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-warm-muted bg-warm-bg px-2 py-1 rounded-xl border border-warm-border">{item.day}</span>
+                                      {item.description && <p className="text-[10px] md:text-xs text-warm-muted italic font-serif truncate max-w-[150px] md:max-w-[200px]">— {item.description}</p>}
                                     </div>
                                   </div>
                                 </div>
-                                <DeleteButton onDelete={() => deleteEntity('schedule', item.id)} className="p-4" />
+                                <DeleteButton onDelete={() => deleteEntity('schedule', item.id)} className="p-2 sm:p-4" />
                               </div>
                             ))}
                             {schedule.length === 0 && (
@@ -2066,9 +2147,9 @@ export default function App() {
                             )}
                           </div>
                         </div>
-                        <div className="space-y-6">
-                          <p className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mb-4">Aggiungi Attività</p>
-                          <div className="bg-warm-bg p-6 md:p-10 rounded-[2rem] border border-warm-border">
+                        <div className="space-y-4 md:space-y-6">
+                          <p className="text-[9px] md:text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mb-4">Aggiungi Attività</p>
+                          <div className="bg-warm-bg p-5 md:p-10 rounded-[1.5rem] md:rounded-[2rem] border border-warm-border">
                             <ScheduleForm />
                           </div>
                         </div>
@@ -2077,30 +2158,30 @@ export default function App() {
                   )}
 
                   {adminTab === 'events' && (
-                    <div className="p-6 md:p-12 space-y-12">
-                      <div className="space-y-10">
-                        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Eventi in Programma</h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                          <div className="grid gap-6">
+                    <div className="p-4 md:p-12 space-y-8 md:space-y-12">
+                      <div className="space-y-6 md:space-y-10">
+                        <h3 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic">Eventi in Programma</h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                          <div className="grid gap-4 md:gap-6">
                             {events.map(event => (
-                              <div key={event.id} className="p-6 bg-warm-card border border-warm-border rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex justify-between items-start">
-                                <div>
-                                  <div className="flex items-center gap-4 mb-2">
-                                    <h4 className="font-bold text-xl text-warm-text">{event.title}</h4>
-                                    <span className="px-3 py-1 bg-warm-bg border border-warm-border text-warm-muted rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                                      <Calendar className="w-3.5 h-3.5 text-warm-accent/40" />
+                              <div key={event.id} className="p-4 md:p-6 bg-warm-card border border-warm-border rounded-[1.5rem] md:rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex justify-between items-start gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-4 mb-2">
+                                    <h4 className="font-bold text-lg md:text-xl text-warm-text truncate">{event.title}</h4>
+                                    <span className="px-2.5 py-1 bg-warm-bg border border-warm-border text-warm-muted rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 md:gap-2 w-fit">
+                                      <Calendar className="w-3 md:w-3.5 h-3 md:h-3.5 text-warm-accent/40" />
                                       {new Date(event.date).toLocaleDateString('it-IT')}
                                     </span>
                                   </div>
-                                  <p className="text-warm-text/60 text-sm leading-relaxed font-sans">{event.description}</p>
+                                  <p className="text-warm-text/60 text-xs md:text-sm leading-relaxed font-sans line-clamp-2">{event.description}</p>
                                   {event.location && (
-                                    <div className="flex items-center gap-2 mt-4 text-[10px] font-bold uppercase tracking-widest text-warm-muted">
-                                      <MapPin className="w-4 h-4 text-warm-accent/40" />
+                                    <div className="flex items-center gap-1.5 md:gap-2 mt-3 md:mt-4 text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-warm-muted">
+                                      <MapPin className="w-3.5 md:w-4 h-3.5 md:h-4 text-warm-accent/40" />
                                       {event.location}
                                     </div>
                                   )}
                                 </div>
-                                <DeleteButton onDelete={() => deleteEntity('events', event.id)} />
+                                <DeleteButton onDelete={() => deleteEntity('events', event.id)} className="p-2" />
                               </div>
                             ))}
                             {events.length === 0 && (
@@ -2109,7 +2190,7 @@ export default function App() {
                               </div>
                             )}
                           </div>
-                          <div className="bg-warm-bg p-6 md:p-10 rounded-[2rem] border border-warm-border">
+                          <div className="bg-warm-bg p-5 md:p-10 rounded-[1.5rem] md:rounded-[2rem] border border-warm-border">
                             <EventForm />
                           </div>
                         </div>
@@ -2118,34 +2199,34 @@ export default function App() {
                   )}
 
                   {adminTab === 'users' && (
-                    <div className="p-6 md:p-12 space-y-12">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Gestione Utenti</h3>
+                    <div className="p-4 md:p-12 space-y-8 md:space-y-12">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
+                        <h3 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic">Gestione Utenti</h3>
                         <div className="relative flex-1 max-w-md">
-                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-warm-accent/40" />
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-warm-accent/40" />
                           <input 
                             type="text" 
                             placeholder="Cerca utenti..." 
                             value={userSearch}
                             onChange={(e) => setUserSearch(e.target.value)}
-                            className="w-full pl-12 pr-6 py-3.5 bg-warm-bg border border-warm-border rounded-[1.5rem] text-sm outline-none focus:ring-4 focus:ring-warm-accent/5 focus:border-warm-accent transition-all font-sans"
+                            className="w-full pl-10 md:pl-12 pr-4 md:pr-6 py-2.5 md:py-3.5 bg-warm-bg border border-warm-border rounded-2xl md:rounded-[1.5rem] text-sm outline-none focus:ring-4 focus:ring-warm-accent/5 focus:border-warm-accent transition-all font-sans"
                           />
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                        <div className="lg:col-span-2 space-y-8">
-                          <p className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em]">Lista Utenti</p>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+                        <div className="lg:col-span-2 space-y-6 md:space-y-8">
+                          <p className="text-[9px] md:text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em]">Lista Utenti</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             {allUsers.filter(u => 
                               (u.email || '').toLowerCase().includes(userSearch.toLowerCase()) || 
                               (u.firstName + ' ' + u.lastName).toLowerCase().includes(userSearch.toLowerCase()) ||
                               (u.displayName || '').toLowerCase().includes(userSearch.toLowerCase())
                             ).map(u => (
-                              <div key={u.uid} className="p-6 md:p-8 bg-warm-card border border-warm-border rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group overflow-hidden">
-                                <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 mb-8">
-                                  <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border transition-all duration-500 shrink-0 ${
+                              <div key={u.uid} className="p-4 md:p-8 bg-warm-card border border-warm-border rounded-[1.5rem] md:rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group overflow-hidden">
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 md:gap-6 mb-6 md:mb-8">
+                                  <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 text-center sm:text-left">
+                                    <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center border transition-all duration-500 shrink-0 ${
                                       u.isManual ? 'bg-amber-50 text-amber-500 border-amber-100' : 'bg-warm-bg text-warm-accent border-warm-border group-hover:bg-warm-accent group-hover:text-white'
                                     }`}>
                                       <UserCircle className="w-10 h-10" />
@@ -2303,18 +2384,35 @@ function NavButton({ active, onClick, icon, label }: { active: boolean, onClick:
   );
 }
 
-function AdminTab({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
+function AdminTab({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, key?: React.Key }) {
   return (
     <button 
       onClick={onClick} 
-      className={`flex items-center gap-3 px-6 py-3 rounded-full transition-all duration-500 border font-sans text-[8px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ${
+      className={`flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-500 border font-sans text-xs font-bold uppercase tracking-widest whitespace-nowrap w-full justify-center ${
         active 
-          ? 'bg-warm-accent text-white border-warm-accent shadow-lg shadow-warm-accent/20 scale-[1.05]' 
+          ? 'bg-warm-accent text-white border-warm-accent shadow-lg shadow-warm-accent/20 scale-[1.02]' 
           : 'bg-warm-card border-warm-border text-warm-muted hover:border-warm-accent/30 hover:bg-warm-bg'
       }`}
     >
       <span className={`${active ? 'text-white' : 'text-warm-accent'}`}>{icon}</span>
       <span>{label}</span>
+    </button>
+  );
+}
+
+function AdminMenuButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, key?: React.Key }) {
+  return (
+    <button 
+      onClick={onClick} 
+      className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 font-sans text-xs font-bold uppercase tracking-widest w-full text-left ${
+        active 
+          ? 'bg-warm-accent/10 text-warm-accent' 
+          : 'text-warm-muted hover:bg-warm-bg'
+      }`}
+    >
+      <span className={`${active ? 'text-warm-accent' : 'text-warm-accent/60'}`}>{icon}</span>
+      <span>{label}</span>
+      {active && <div className="ml-auto w-1.5 h-1.5 bg-warm-accent rounded-full" />}
     </button>
   );
 }
