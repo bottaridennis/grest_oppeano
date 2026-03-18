@@ -33,6 +33,12 @@ service cloud.firestore {
     // Collection: legalContent
     // Fields: id, type, content, updatedAt
     //
+    // Collection: notifications
+    // Fields: id, title, message, type, targetGroup, createdAt, senderUid
+    //
+    // Collection: notificationReads
+    // Fields: id, notificationId, userUid, readAt
+    //
     // ===============================================================
 
     // ===============================================================
@@ -49,9 +55,9 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() &&
-        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-          (request.auth.token.email == "dennisbottari@gmail.com" && request.auth.token.email_verified == true));
+        ((request.auth.token.email == "dennisbottari@gmail.com" && request.auth.token.email_verified == true) ||
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
     }
 
     function isAnimator() {
@@ -102,9 +108,40 @@ service cloud.firestore {
              data.respondedAt is timestamp;
     }
 
+    function isValidNotification(data) {
+      return hasRequiredFields(['title', 'message', 'type', 'targetGroup', 'createdAt', 'senderUid']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.message is string && data.message.size() > 0 && data.message.size() < 2000 &&
+             data.type in ['info', 'warning', 'urgent'] &&
+             data.targetGroup in ['all', 'parents', 'animators'] &&
+             data.createdAt is timestamp &&
+             data.senderUid is string;
+    }
+
+    function isValidNotificationRead(data) {
+      return hasRequiredFields(['notificationId', 'userUid', 'readAt']) &&
+             data.notificationId is string &&
+             data.userUid is string &&
+             data.readAt is timestamp;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
+
+    match /notifications/{notifId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidNotification(request.resource.data);
+      allow update: if isAdmin() && isValidNotification(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /notificationReads/{readId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userUid || isAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userUid && isValidNotificationRead(request.resource.data);
+      allow update: if isAuthenticated() && request.auth.uid == resource.data.userUid && isValidNotificationRead(request.resource.data);
+      allow delete: if isAdmin();
+    }
 
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
