@@ -1806,8 +1806,8 @@ export default function App() {
                     <p className="text-warm-muted font-sans tracking-wide text-sm md:text-lg font-light">Un unico spazio per coordinare l'energia del Grest Oppeano.</p>
                   </div>
                   
-                  {/* Mobile Admin Menu Button - Improved positioning and style */}
-                  <div className="lg:hidden relative">
+                  {/* Mobile Admin Menu Button - Hidden on md and up */}
+                  <div className="md:hidden relative">
                     <div className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mb-3 ml-2">Sezione Attiva</div>
                     <button 
                       onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
@@ -1826,45 +1826,53 @@ export default function App() {
                     
                     <AnimatePresence>
                       {isAdminMenuOpen && (
-                        <>
-                          <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsAdminMenuOpen(false)}
-                            className="fixed inset-0 z-[60] bg-stone-900/40"
-                          />
-                          <motion.div 
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="fixed inset-x-6 top-[15%] z-[70] bg-white rounded-[2.5rem] shadow-2xl border border-warm-border overflow-hidden p-6 max-w-sm mx-auto"
-                          >
-                            <div className="flex items-center justify-between mb-6 px-2">
-                              <h3 className="text-xl font-serif italic font-bold text-warm-text">Menu Admin</h3>
-                              <button onClick={() => setIsAdminMenuOpen(false)} className="p-2 hover:bg-warm-bg rounded-full transition-colors">
-                                <X className="w-5 h-5 text-warm-muted" />
-                              </button>
+                        <motion.div 
+                          initial={{ opacity: 0, y: '100%' }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: '100%' }}
+                          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                          className="fixed inset-0 z-[70] bg-white flex flex-col p-8 md:hidden"
+                        >
+                          <div className="flex items-center justify-between mb-10">
+                            <div>
+                              <h3 className="text-3xl font-serif italic font-bold text-warm-text">Menu Admin</h3>
+                              <p className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mt-1">Seleziona una sezione</p>
                             </div>
-                            <div className="grid gap-2 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
-                              {adminTabs.map(tab => (
-                                <AdminMenuButton 
-                                  key={tab.id}
-                                  active={adminTab === tab.id} 
-                                  onClick={() => { setAdminTab(tab.id); setIsAdminMenuOpen(false); }} 
-                                  icon={tab.icon} 
-                                  label={tab.label} 
-                                />
-                              ))}
-                            </div>
-                          </motion.div>
-                        </>
+                            <button 
+                              onClick={() => setIsAdminMenuOpen(false)} 
+                              className="w-12 h-12 bg-warm-bg flex items-center justify-center rounded-2xl hover:bg-warm-accent/5 transition-colors"
+                            >
+                              <X className="w-6 h-6 text-warm-muted" />
+                            </button>
+                          </div>
+                          
+                          <div className="flex-1 overflow-y-auto no-scrollbar space-y-2 pb-12">
+                            {adminTabs.map(tab => (
+                              <AdminMenuButton 
+                                key={tab.id}
+                                active={adminTab === tab.id} 
+                                onClick={() => { setAdminTab(tab.id); setIsAdminMenuOpen(false); }} 
+                                icon={React.cloneElement(tab.icon as React.ReactElement, { className: "w-6 h-6" })} 
+                                label={tab.label} 
+                              />
+                            ))}
+                          </div>
+
+                          <div className="pt-6 border-t border-warm-border">
+                            <button 
+                              onClick={() => setIsAdminMenuOpen(false)}
+                              className="w-full py-4 bg-warm-accent text-white rounded-2xl font-bold shadow-lg shadow-warm-accent/20"
+                            >
+                              Chiudi Menu
+                            </button>
+                          </div>
+                        </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  {/* Desktop Admin Tabs - Separate and clearly visible */}
-                  <div className="hidden lg:grid grid-cols-3 xl:grid-cols-5 gap-4 w-full">
+                  {/* Desktop Admin Tabs - Visible on md and up */}
+                  <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 w-full">
                     {adminTabs.map(tab => (
                       <AdminTab 
                         key={tab.id}
