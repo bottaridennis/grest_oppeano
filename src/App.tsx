@@ -1349,12 +1349,12 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
             <div className="flex items-center gap-12">
               <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setActiveTab('home')}>
-                <div className="w-12 h-12 bg-warm-accent rounded-2xl flex items-center justify-center text-white shadow-lg shadow-warm-accent/20 group-hover:rotate-12 transition-all duration-500">
-                  <Heart className="w-6 h-6 fill-current" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-warm-accent rounded-2xl flex items-center justify-center text-white shadow-lg shadow-warm-accent/20 group-hover:rotate-12 transition-all duration-500">
+                  <Heart className="w-5 h-5 md:w-6 md:h-6 fill-current" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-warm-text tracking-tight font-serif italic leading-none">Grest <span className="text-warm-accent">Oppeano</span></h1>
-                  <p className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.3em] mt-1">Comunità in Cammino</p>
+                  <h1 className="text-xl md:text-2xl font-bold text-warm-text tracking-tight font-serif italic leading-none">Grest <span className="text-warm-accent">Oppeano</span></h1>
+                  <p className="text-[8px] md:text-[10px] font-bold text-warm-muted uppercase tracking-[0.3em] mt-1 hidden xs:block">Comunità in Cammino</p>
                 </div>
               </div>
 
@@ -1436,7 +1436,7 @@ export default function App() {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
-                      className="text-7xl md:text-9xl font-bold text-white mb-10 tracking-tighter leading-[0.85] font-serif relative inline-block"
+                      className="text-5xl md:text-9xl font-bold text-white mb-10 tracking-tighter leading-[0.85] font-serif relative inline-block"
                     >
                       <Sparkles className="absolute -top-12 -left-12 w-12 h-12 text-warm-secondary/40 animate-pulse" />
                       Comunità <br/><span className="text-warm-secondary italic">in Cammino</span>
@@ -1780,19 +1780,19 @@ export default function App() {
               <motion.div key="admin" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-10">
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 py-6">
                   <div className="max-w-xl">
-                    <h2 className="text-6xl font-bold text-warm-text font-serif italic mb-4 leading-none">Gestione <br/><span className="text-warm-accent">Creativa</span></h2>
-                    <p className="text-warm-muted font-sans tracking-wide text-lg font-light">Un unico spazio per coordinare l'energia del Grest Oppeano.</p>
+                    <h2 className="text-4xl md:text-6xl font-bold text-warm-text font-serif italic mb-4 leading-none">Gestione <br/><span className="text-warm-accent">Creativa</span></h2>
+                    <p className="text-warm-muted font-sans tracking-wide text-base md:text-lg font-light">Un unico spazio per coordinare l'energia del Grest Oppeano.</p>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap gap-3 w-full lg:w-auto">
-                    <AdminTab active={adminTab === 'dashboard'} onClick={() => setAdminTab('dashboard')} icon={<BarChart3 className="w-4 h-4" />} label="Dashboard" />
-                    <AdminTab active={adminTab === 'registrations'} onClick={() => setAdminTab('registrations')} icon={<Users className="w-4 h-4" />} label="Iscrizioni" />
-                    <AdminTab active={adminTab === 'attendance'} onClick={() => setAdminTab('attendance')} icon={<CheckCircle className="w-4 h-4" />} label="Presenze" />
-                    <AdminTab active={adminTab === 'surveys'} onClick={() => setAdminTab('surveys')} icon={<Vote className="w-4 h-4" />} label="Sondaggi" />
-                    <AdminTab active={adminTab === 'announcements'} onClick={() => setAdminTab('announcements')} icon={<Megaphone className="w-4 h-4" />} label="Annunci" />
-                    <AdminTab active={adminTab === 'schedule'} onClick={() => setAdminTab('schedule')} icon={<Timer className="w-4 h-4" />} label="Orari" />
-                    <AdminTab active={adminTab === 'events'} onClick={() => setAdminTab('events')} icon={<Calendar className="w-4 h-4" />} label="Eventi" />
-                    <AdminTab active={adminTab === 'users'} onClick={() => setAdminTab('users')} icon={<UserCircle className="w-4 h-4" />} label="Utenti" />
-                    <AdminTab active={adminTab === 'legal'} onClick={() => setAdminTab('legal')} icon={<ShieldCheck className="w-4 h-4" />} label="Legale" />
+                  <div className="flex overflow-x-auto pb-4 lg:pb-0 lg:flex-wrap gap-3 w-full lg:w-auto no-scrollbar scroll-smooth snap-x">
+                    <div className="snap-start"><AdminTab active={adminTab === 'dashboard'} onClick={() => setAdminTab('dashboard')} icon={<BarChart3 className="w-4 h-4" />} label="Dashboard" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'registrations'} onClick={() => setAdminTab('registrations')} icon={<Users className="w-4 h-4" />} label="Iscrizioni" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'attendance'} onClick={() => setAdminTab('attendance')} icon={<CheckCircle className="w-4 h-4" />} label="Presenze" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'surveys'} onClick={() => setAdminTab('surveys')} icon={<Vote className="w-4 h-4" />} label="Sondaggi" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'announcements'} onClick={() => setAdminTab('announcements')} icon={<Megaphone className="w-4 h-4" />} label="Annunci" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'schedule'} onClick={() => setAdminTab('schedule')} icon={<Timer className="w-4 h-4" />} label="Orari" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'events'} onClick={() => setAdminTab('events')} icon={<Calendar className="w-4 h-4" />} label="Eventi" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'users'} onClick={() => setAdminTab('users')} icon={<UserCircle className="w-4 h-4" />} label="Utenti" /></div>
+                    <div className="snap-start"><AdminTab active={adminTab === 'legal'} onClick={() => setAdminTab('legal')} icon={<ShieldCheck className="w-4 h-4" />} label="Legale" /></div>
                   </div>
                 </div>
 
@@ -2271,12 +2271,12 @@ export default function App() {
           </div>
         </footer>
 
-        <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 md:hidden">
-          <div className="bg-warm-card/80 backdrop-blur-2xl border border-warm-border p-2 rounded-full shadow-2xl flex items-center gap-1">
-            <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={<Home className="w-4 h-4" />} label="Home" />
-            <NavButton active={activeTab === 'register'} onClick={() => setActiveTab('register')} icon={<UserPlus className="w-4 h-4" />} label="Iscriviti" />
-            {user && <NavButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<UserCircle className="w-4 h-4" />} label="Profilo" />}
-            {profile?.role === 'admin' && <NavButton active={activeTab === 'admin'} onClick={() => setActiveTab('admin')} icon={<Settings className="w-4 h-4" />} label="Admin" />}
+        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden w-[95%] max-w-md">
+          <div className="bg-warm-card/90 backdrop-blur-2xl border border-warm-border p-2 rounded-[2rem] shadow-2xl flex items-center justify-around gap-1">
+            <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={<Home className="w-5 h-5" />} label="Home" />
+            <NavButton active={activeTab === 'register'} onClick={() => setActiveTab('register')} icon={<UserPlus className="w-5 h-5" />} label="Iscriviti" />
+            {user && <NavButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<UserCircle className="w-5 h-5" />} label="Profilo" />}
+            {profile?.role === 'admin' && <NavButton active={activeTab === 'admin'} onClick={() => setActiveTab('admin')} icon={<Settings className="w-5 h-5" />} label="Admin" />}
           </div>
         </nav>
       </div>
@@ -2288,12 +2288,12 @@ function NavButton({ active, onClick, icon, label }: { active: boolean, onClick:
   return (
     <button 
       onClick={onClick} 
-      className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all duration-500 relative group ${
-        active ? 'bg-warm-accent text-white shadow-md' : 'text-warm-muted hover:text-warm-accent hover:bg-warm-accent/5'
+      className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-2xl md:rounded-full transition-all duration-500 relative group flex-1 md:flex-none ${
+        active ? 'bg-warm-accent text-white shadow-lg' : 'text-warm-muted hover:text-warm-accent hover:bg-warm-accent/5'
       }`}
     >
       <span className="transition-transform group-hover:scale-110">{icon}</span>
-      <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+      <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">{label}</span>
     </button>
   );
 }
@@ -2302,7 +2302,7 @@ function AdminTab({ active, onClick, icon, label }: { active: boolean, onClick: 
   return (
     <button 
       onClick={onClick} 
-      className={`flex items-center gap-3 px-6 py-3 rounded-full transition-all duration-500 border font-sans text-[10px] font-bold uppercase tracking-widest ${
+      className={`flex items-center gap-3 px-6 py-3 rounded-full transition-all duration-500 border font-sans text-[8px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ${
         active 
           ? 'bg-warm-accent text-white border-warm-accent shadow-lg shadow-warm-accent/20 scale-[1.05]' 
           : 'bg-warm-card border-warm-border text-warm-muted hover:border-warm-accent/30 hover:bg-warm-bg'
