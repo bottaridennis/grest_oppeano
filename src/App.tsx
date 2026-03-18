@@ -531,9 +531,9 @@ const LegalPage: React.FC<{ type: 'privacy' | 'cookies' | 'terms', content?: str
 
   return (
     <div className="max-w-4xl mx-auto py-20 px-6">
-      <h2 className="text-5xl font-bold text-warm-text mb-12 font-serif italic">{titles[type]}</h2>
-      <div className="bg-warm-bg p-10 rounded-[3rem] border border-warm-border shadow-sm">
-        <div className="prose prose-stone max-w-none text-warm-text/80 font-sans leading-relaxed whitespace-pre-wrap">
+      <h2 className="text-3xl md:text-5xl font-bold text-warm-text mb-8 md:mb-12 font-serif italic leading-tight">{titles[type]}</h2>
+      <div className="bg-warm-bg p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-warm-border shadow-sm">
+        <div className="prose prose-stone max-w-none text-warm-text/80 font-sans leading-relaxed whitespace-pre-wrap text-sm md:text-base">
           {content || `Contenuto per ${titles[type]} non ancora disponibile. Contattare l'amministratore.`}
         </div>
       </div>
@@ -552,13 +552,13 @@ const LegalEditor: React.FC<{ content: LegalContent[], onSave: (type: string, te
 
   return (
     <div className="space-y-8">
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-3">
         {(['privacy', 'cookies', 'terms'] as const).map(t => (
           <button
             key={t}
             onClick={() => setActiveType(t)}
-            className={`px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${
-              activeType === t ? 'bg-warm-accent text-white shadow-lg' : 'bg-warm-bg text-warm-muted border border-warm-border'
+            className={`flex-1 sm:flex-none px-6 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all border ${
+              activeType === t ? 'bg-warm-accent text-white border-warm-accent shadow-lg' : 'bg-warm-bg text-warm-muted border-warm-border hover:bg-warm-accent/5'
             }`}
           >
             {t}
@@ -900,39 +900,39 @@ const ProfileView: React.FC<{ user: User, profile: UserProfile, registrations: R
         <h3 className="text-3xl font-bold text-warm-text font-serif italic">I Miei Bambini</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {myChildren.map(child => (
-            <div key={child.id} className="bg-warm-card p-8 rounded-[3rem] border border-warm-border shadow-sm group hover:shadow-md transition-all duration-500">
+            <div key={child.id} className="bg-warm-card p-6 md:p-8 rounded-[2.5rem] md:rounded-[3rem] border border-warm-border shadow-sm group hover:shadow-md transition-all duration-500 overflow-hidden">
               <div className="flex justify-between items-start mb-6">
-                <div className="w-14 h-14 bg-warm-accent/10 rounded-2xl flex items-center justify-center text-warm-accent">
-                  <Heart className="w-8 h-8" />
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-warm-accent/10 rounded-2xl flex items-center justify-center text-warm-accent">
+                  <Heart className="w-6 h-6 md:w-8 md:h-8" />
                 </div>
-                <button onClick={() => onEditRegistration(child)} className="p-3 text-warm-muted hover:text-warm-accent hover:bg-warm-accent/5 rounded-2xl transition-all">
+                <button onClick={() => onEditRegistration(child)} className="p-3 text-warm-muted hover:text-warm-accent hover:bg-warm-accent/5 rounded-2xl transition-all border border-transparent hover:border-warm-accent/10">
                   <Edit2 className="w-5 h-5" />
                 </button>
               </div>
-              <h4 className="text-2xl font-bold text-warm-text font-serif italic mb-2">{child.childName} {child.childSurname}</h4>
-              <div className="space-y-2">
+              <h4 className="text-xl md:text-2xl font-bold text-warm-text font-serif italic mb-3 truncate">{child.childName} {child.childSurname}</h4>
+              <div className="space-y-3">
                 <p className="text-xs text-warm-muted font-sans flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-warm-accent/40" />
-                  Nato il: {new Date(child.birthDate).toLocaleDateString('it-IT')}
+                  Nato il: <span className="text-warm-text font-medium">{new Date(child.birthDate).toLocaleDateString('it-IT')}</span>
                 </p>
                 <p className="text-xs text-warm-muted font-sans flex items-center gap-2">
                   <ShieldCheck className={`w-4 h-4 ${child.status === 'confirmed' ? 'text-emerald-500' : 'text-amber-500'}`} />
-                  Stato: <span className="font-bold uppercase tracking-widest">{child.status}</span>
+                  Stato: <span className={`font-bold uppercase tracking-widest ${child.status === 'confirmed' ? 'text-emerald-600' : 'text-amber-600'}`}>{child.status}</span>
                 </p>
               </div>
               {(child.allergies && child.allergies.length > 0) && (
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-6 flex flex-wrap gap-1.5">
                   {child.allergies.map(a => (
-                    <span key={a} className="px-3 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[10px] font-bold uppercase tracking-widest">
+                    <span key={a} className="px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[9px] font-bold uppercase tracking-widest">
                       {a}
                     </span>
                   ))}
                 </div>
               )}
               {child.medicalNotes && (
-                <div className="mt-6 p-4 bg-warm-bg rounded-2xl border border-warm-border">
-                  <p className="text-[10px] font-bold text-warm-muted uppercase tracking-widest mb-1">Note Mediche</p>
-                  <p className="text-xs text-warm-text/70 font-sans italic">{child.medicalNotes}</p>
+                <div className="mt-6 p-4 bg-warm-bg/50 rounded-2xl border border-warm-border/50">
+                  <p className="text-[10px] font-bold text-warm-muted uppercase tracking-widest mb-1.5">Note Mediche</p>
+                  <p className="text-xs text-warm-text/70 font-sans italic leading-relaxed break-words">{child.medicalNotes}</p>
                 </div>
               )}
             </div>
@@ -1580,18 +1580,18 @@ export default function App() {
                                 {registrations.filter(r => r.status === 'confirmed').map(reg => {
                                   const response = surveyResponses.find(sr => sr.surveyId === survey.id && sr.registrationId === reg.id);
                                   return (
-                                    <div key={reg.id} className="flex items-center justify-between p-4 bg-warm-bg/50 rounded-[1.5rem] border border-warm-border hover:border-warm-accent/30 transition-all duration-300">
-                                      <span className="text-base font-medium text-warm-text ml-2 font-serif">{reg.childName}</span>
-                                      <div className="flex gap-3">
+                                    <div key={reg.id} className="flex flex-col sm:flex-row items-center justify-between p-6 bg-warm-bg/50 rounded-[2rem] border border-warm-border hover:border-warm-accent/30 transition-all duration-300 gap-4">
+                                      <span className="text-lg font-bold text-warm-text font-serif italic">{reg.childName}</span>
+                                      <div className="flex gap-3 w-full sm:w-auto">
                                         <button 
                                           onClick={() => submitSurveyResponse(survey.id, reg.id, true)} 
-                                          className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 ${response?.participating === true ? 'bg-warm-accent text-white shadow-lg shadow-warm-accent/20' : 'bg-warm-card border border-warm-border text-warm-muted hover:bg-warm-accent/5'}`}
+                                          className={`flex-1 sm:flex-none px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 ${response?.participating === true ? 'bg-warm-accent text-white shadow-lg shadow-warm-accent/20' : 'bg-warm-card border border-warm-border text-warm-muted hover:bg-warm-accent/5'}`}
                                         >
                                           Sì
                                         </button>
                                         <button 
                                           onClick={() => submitSurveyResponse(survey.id, reg.id, false)} 
-                                          className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 ${response?.participating === false ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-warm-card border border-warm-border text-warm-muted hover:bg-red-50'}`}
+                                          className={`flex-1 sm:flex-none px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 ${response?.participating === false ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-warm-card border border-warm-border text-warm-muted hover:bg-red-50'}`}
                                         >
                                           No
                                         </button>
@@ -1834,19 +1834,19 @@ export default function App() {
                       </div>
                       <div className="grid gap-6">
                         {allRegistrations.map(reg => (
-                          <div key={reg.id} className="p-6 bg-warm-card border border-warm-border rounded-[2rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group">
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                              <div className="flex gap-5">
-                                <div className="w-16 h-16 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-2xl group-hover:bg-warm-accent group-hover:text-white transition-all duration-500 border border-warm-border">
+                          <div key={reg.id} className="p-5 md:p-8 bg-warm-card border border-warm-border rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group overflow-hidden">
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                              <div className="flex flex-col sm:flex-row gap-6">
+                                <div className="w-16 h-16 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-2xl group-hover:bg-warm-accent group-hover:text-white transition-all duration-500 border border-warm-border shrink-0 mx-auto sm:mx-0">
                                   {reg.childName[0]}{reg.childSurname[0]}
                                 </div>
-                                <div>
-                                  <p className="font-bold text-xl text-warm-text">{reg.childName} {reg.childSurname}</p>
-                                  <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted flex items-center gap-2 bg-warm-bg px-3 py-1.5 rounded-xl border border-warm-border">
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-2xl text-warm-text text-center sm:text-left truncate">{reg.childName} {reg.childSurname}</p>
+                                  <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted flex items-center gap-2 bg-warm-bg px-3 py-2 rounded-xl border border-warm-border">
                                       <Calendar className="w-4 h-4 text-warm-accent/40" /> {new Date(reg.birthDate).toLocaleDateString('it-IT')}
                                     </span>
-                                    <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-xl border flex items-center gap-2 ${
+                                    <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-xl border flex items-center gap-2 ${
                                       reg.status === 'confirmed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
                                       reg.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
                                       'bg-red-50 text-red-600 border-red-100'
@@ -1860,7 +1860,7 @@ export default function App() {
                                     </span>
                                     <button 
                                       onClick={() => toggleGrestPayment(reg.id, !!reg.paidGrestFee)}
-                                      className={`text-[10px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-2 transition-all border ${
+                                      className={`text-[10px] font-bold px-3 py-2 rounded-xl flex items-center gap-2 transition-all border ${
                                         reg.paidGrestFee ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100' : 'bg-red-50 text-red-700 border-red-100 hover:bg-red-100'
                                       }`}
                                     >
@@ -1869,32 +1869,34 @@ export default function App() {
                                     </button>
                                   </div>
                                   {(reg.allergies && reg.allergies.length > 0) && (
-                                    <div className="flex flex-wrap gap-1 mt-2">
+                                    <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mt-4">
                                       {reg.allergies.map(a => (
-                                        <span key={a} className="px-2 py-0.5 bg-red-50 text-red-600 border border-red-100 rounded-md text-[8px] font-bold uppercase tracking-tighter">
+                                        <span key={a} className="px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[9px] font-bold uppercase tracking-tight">
                                           {a}
                                         </span>
                                       ))}
                                     </div>
                                   )}
                                   {reg.medicalNotes && (
-                                    <p className="text-[10px] text-warm-muted italic mt-2 font-sans line-clamp-1">
-                                      <Info className="w-3 h-3 inline mr-1 opacity-50" /> {reg.medicalNotes}
-                                    </p>
+                                    <div className="mt-4 p-3 bg-warm-bg/50 rounded-xl border border-warm-border/50">
+                                      <p className="text-[10px] text-warm-muted italic font-sans break-words">
+                                        <Info className="w-3.5 h-3.5 inline mr-1.5 opacity-50" /> {reg.medicalNotes}
+                                      </p>
+                                    </div>
                                   )}
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3">
-                                <button onClick={() => setEditingRegistration(reg)} className="p-3 bg-warm-bg text-warm-muted rounded-2xl hover:bg-warm-accent hover:text-white transition-all shadow-sm" title="Modifica">
+                              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 pt-6 lg:pt-0 border-t lg:border-t-0 border-warm-border/50">
+                                <button onClick={() => setEditingRegistration(reg)} className="p-4 bg-warm-bg text-warm-muted rounded-2xl hover:bg-warm-accent hover:text-white transition-all shadow-sm border border-warm-border" title="Modifica">
                                   <Edit2 className="w-6 h-6" />
                                 </button>
                                 {reg.status === 'pending' && (
-                                  <button onClick={() => updateRegistrationStatus(reg.id, 'confirmed')} className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm" title="Conferma">
+                                  <button onClick={() => updateRegistrationStatus(reg.id, 'confirmed')} className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm border border-emerald-100" title="Conferma">
                                     <Check className="w-6 h-6" />
                                   </button>
                                 )}
                                 <LinkParentButton registration={reg} users={allUsers} onLink={linkRegistrationToParent} />
-                                <DeleteButton onDelete={() => deleteEntity('registrations', reg.id)} className="bg-red-50" />
+                                <DeleteButton onDelete={() => deleteEntity('registrations', reg.id)} className="bg-red-50 p-4" />
                               </div>
                             </div>
                           </div>
@@ -1922,11 +1924,11 @@ export default function App() {
                         {allRegistrations.filter(r => r.status === 'confirmed').map(reg => {
                           const isPresent = attendance.find(a => a.registrationId === reg.id)?.present;
                           return (
-                            <div key={reg.id} className="p-5 bg-warm-card border border-warm-border rounded-2xl flex items-center justify-between hover:shadow-lg hover:shadow-warm-accent/5 transition-all">
-                              <p className="font-bold text-warm-text text-lg">{reg.childName} {reg.childSurname}</p>
+                            <div key={reg.id} className="p-5 bg-warm-card border border-warm-border rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 hover:shadow-lg hover:shadow-warm-accent/5 transition-all group">
+                              <p className="font-bold text-warm-text text-lg font-serif italic">{reg.childName} {reg.childSurname}</p>
                               <button 
                                 onClick={() => toggleAttendance(reg.id)} 
-                                className={`px-6 py-3 rounded-xl text-xs font-bold transition-all shadow-lg ${isPresent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-warm-bg text-warm-muted border border-warm-border'}`}
+                                className={`w-full sm:w-auto px-8 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg ${isPresent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-warm-bg text-warm-muted border border-warm-border hover:bg-warm-accent/5'}`}
                               >
                                 {isPresent ? 'Presente' : 'Assente'}
                               </button>
@@ -1993,18 +1995,18 @@ export default function App() {
                                       {participants.map(p => {
                                         const reg = allRegistrations.find(r => r.id === p.registrationId);
                                         return (
-                                          <div key={p.id} className="flex items-center justify-between p-3.5 bg-warm-bg rounded-2xl border border-warm-border group/item hover:border-warm-accent/30 transition-all">
-                                            <span className="text-xs font-bold text-warm-text">
+                                          <div key={p.id} className="flex flex-col sm:flex-row items-center justify-between p-4 bg-warm-bg rounded-2xl border border-warm-border group/item hover:border-warm-accent/30 transition-all gap-3">
+                                            <span className="text-xs font-bold text-warm-text truncate max-w-full">
                                               {reg ? `${reg.childName} ${reg.childSurname}` : 'Sconosciuto'}
                                             </span>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 w-full sm:w-auto justify-center">
                                               <button 
                                                 onClick={() => toggleTripPayment(p.id!, !!p.paidTripFee)}
-                                                className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all border ${p.paidTripFee ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}
+                                                className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all border ${p.paidTripFee ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}
                                               >
                                                 {p.paidTripFee ? 'Pagato' : 'No'}
                                               </button>
-                                              <DeleteButton onDelete={() => deleteEntity('surveyResponses', p.id!)} className="p-1.5 border-none bg-transparent" />
+                                              <DeleteButton onDelete={() => deleteEntity('surveyResponses', p.id!)} className="p-2 border-none bg-transparent hover:bg-red-50" />
                                             </div>
                                           </div>
                                         );
@@ -2041,20 +2043,20 @@ export default function App() {
                           <p className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] mb-4">Programma Attuale</p>
                           <div className="grid gap-4">
                             {schedule.map(item => (
-                              <div key={item.id} className="p-5 bg-warm-card border border-warm-border rounded-[2rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex items-center justify-between">
-                                <div className="flex gap-5">
-                                  <div className="w-20 h-14 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-lg border border-warm-border group-hover:bg-warm-accent group-hover:text-white transition-all duration-500">
+                              <div key={item.id} className="p-6 bg-warm-card border border-warm-border rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group flex flex-col sm:flex-row items-center justify-between gap-6">
+                                <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left w-full">
+                                  <div className="w-24 h-16 bg-warm-bg rounded-2xl flex items-center justify-center text-warm-accent font-bold text-xl border border-warm-border group-hover:bg-warm-accent group-hover:text-white transition-all duration-500 shrink-0">
                                     {item.time}
                                   </div>
-                                  <div>
-                                    <p className="font-bold text-warm-text text-lg">{item.activity}</p>
-                                    <div className="flex items-center gap-3 mt-1">
-                                      <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted bg-warm-bg px-2.5 py-1 rounded-lg border border-warm-border">{item.day}</span>
-                                      {item.description && <p className="text-xs text-warm-muted italic font-serif">— {item.description}</p>}
+                                  <div className="min-w-0 flex-1">
+                                    <p className="font-bold text-warm-text text-xl font-serif italic">{item.activity}</p>
+                                    <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 mt-2">
+                                      <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted bg-warm-bg px-3 py-1.5 rounded-xl border border-warm-border">{item.day}</span>
+                                      {item.description && <p className="text-xs text-warm-muted italic font-serif truncate max-w-[200px]">— {item.description}</p>}
                                     </div>
                                   </div>
                                 </div>
-                                <DeleteButton onDelete={() => deleteEntity('schedule', item.id)} />
+                                <DeleteButton onDelete={() => deleteEntity('schedule', item.id)} className="p-4" />
                               </div>
                             ))}
                             {schedule.length === 0 && (
@@ -2140,38 +2142,41 @@ export default function App() {
                               (u.firstName + ' ' + u.lastName).toLowerCase().includes(userSearch.toLowerCase()) ||
                               (u.displayName || '').toLowerCase().includes(userSearch.toLowerCase())
                             ).map(u => (
-                              <div key={u.uid} className="p-6 bg-warm-card border border-warm-border rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group">
-                                <div className="flex items-center justify-between gap-4 mb-6">
-                                  <div className="flex items-center gap-4">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all duration-500 ${
+                              <div key={u.uid} className="p-6 md:p-8 bg-warm-card border border-warm-border rounded-[2.5rem] hover:shadow-xl hover:shadow-warm-accent/5 transition-all group overflow-hidden">
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 mb-8">
+                                  <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border transition-all duration-500 shrink-0 ${
                                       u.isManual ? 'bg-amber-50 text-amber-500 border-amber-100' : 'bg-warm-bg text-warm-accent border-warm-border group-hover:bg-warm-accent group-hover:text-white'
                                     }`}>
-                                      <UserCircle className="w-8 h-8" />
+                                      <UserCircle className="w-10 h-10" />
                                     </div>
-                                    <div>
-                                      <p className="font-bold text-lg text-warm-text">{u.firstName ? `${u.firstName} ${u.lastName}` : u.displayName || 'Utente senza nome'}</p>
-                                      <p className="text-xs text-warm-muted font-sans">{u.email || (u.phone ? `Tel: ${u.phone}` : 'Nessun contatto')}</p>
+                                    <div className="min-w-0">
+                                      <p className="font-bold text-xl text-warm-text truncate">{u.firstName ? `${u.firstName} ${u.lastName}` : u.displayName || 'Utente senza nome'}</p>
+                                      <p className="text-xs text-warm-muted font-sans break-all">{u.email || (u.phone ? `Tel: ${u.phone}` : 'Nessun contatto')}</p>
                                     </div>
                                   </div>
-                                  <div className="flex items-center gap-2">
-                                    <button onClick={() => setEditingUser(u)} className="p-3 text-stone-300 hover:text-warm-accent hover:bg-warm-accent/5 rounded-2xl transition-all group">
-                                      <Edit2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                  <div className="flex items-center gap-3">
+                                    <button onClick={() => setEditingUser(u)} className="p-4 text-stone-300 hover:text-warm-accent hover:bg-warm-accent/5 rounded-2xl transition-all group border border-transparent hover:border-warm-accent/10">
+                                      <Edit2 className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                     </button>
-                                    <DeleteButton onDelete={() => deleteEntity('users', u.uid)} />
+                                    <DeleteButton onDelete={() => deleteEntity('users', u.uid)} className="p-4" />
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-3 pt-6 border-t border-warm-border">
-                                  <div className="mr-auto">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-warm-muted">Ruolo</p>
-                                    {u.isManual && <span className="text-[8px] font-bold text-amber-600 uppercase tracking-tighter">Manuale</span>}
+                                <div className="flex flex-col sm:flex-row items-center gap-4 pt-6 border-t border-warm-border/50">
+                                  <div className="sm:mr-auto text-center sm:text-left">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-warm-muted mb-1">Ruolo Attuale</p>
+                                    <div className="flex items-center justify-center sm:justify-start gap-2">
+                                      <span className="px-3 py-1 bg-warm-accent/10 text-warm-accent rounded-lg text-[10px] font-bold uppercase tracking-widest border border-warm-accent/20">{u.role}</span>
+                                      {u.isManual && <span className="text-[8px] font-bold text-amber-600 uppercase tracking-tighter bg-amber-50 px-2 py-0.5 rounded border border-amber-100">Manuale</span>}
+                                    </div>
                                   </div>
-                                  <div className="flex gap-2">
+                                  <div className="flex flex-wrap justify-center gap-2">
                                     {(['parent', 'animator', 'admin'] as UserRole[]).map(r => (
                                       <button 
                                         key={r}
                                         onClick={() => updateEntity('users', u.uid, { role: r })}
-                                        className={`px-3 py-1.5 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all border ${
-                                          u.role === r ? 'bg-warm-accent text-white border-warm-accent' : 'bg-warm-bg text-warm-muted border-warm-border'
+                                        className={`px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all border ${
+                                          u.role === r ? 'bg-warm-accent text-white border-warm-accent shadow-md shadow-warm-accent/20' : 'bg-warm-bg text-warm-muted border-warm-border hover:bg-warm-accent/5'
                                         }`}
                                       >
                                         {r}
