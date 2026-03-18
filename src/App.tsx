@@ -33,8 +33,24 @@ import {
   updateDoc
 } from 'firebase/firestore';
 import { auth, db, testConnection } from './firebase';
-import { UserProfile, Registration, GrestEvent, UserRole, Attendance, Survey, SurveyResponse, ScheduleItem, Announcement, LegalContent } from './types';
+import { UserProfile, Registration, GrestEvent, UserRole, Attendance, Survey, SurveyResponse, ScheduleItem, Announcement, LegalContent, Notification, NotificationRead } from './types';
 import { COMMON_ALLERGIES } from './constants';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip as RechartsTooltip, 
+  ResponsiveContainer, 
+  PieChart, 
+  Pie, 
+  Cell,
+  LineChart,
+  Line,
+  AreaChart,
+  Area
+} from 'recharts';
 import { 
   Menu,
   LayoutDashboard, 
@@ -143,7 +159,253 @@ function DeleteButton({ onDelete, className = "" }: { onDelete: () => void, clas
   );
 }
 
-// --- Components ---
+const AdvancedStatistics: React.FC<{
+  registrations: Registration[];
+  users: UserProfile[];
+  attendance: Attendance[];
+  surveys: Survey[];
+  responses: SurveyResponse[];
+}> = ({ registrations, users, attendance, surveys, responses }) => {
+  // 1. Registrations by Status
+  const statusData = [
+    { name: 'Confermate', value: registrations.filter(r => r.status === 'confirmed').length },
+    { name: 'In Sospeso', value: registrations.filter(r => r.status === 'pending').length },
+    { name: 'Annullate', value: registrations.filter(r => r.status === 'cancelled').length },
+  ];
+
+  // 2. Attendance Trend (Last 7 days)
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    return d.toISOString().split('T')[0];
+  }).reverse();
+
+  const attendanceTrend = last7Days.map(date => ({
+    date: new Date(date).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }),
+    presenti: attendance.filter(a => a.date === date && a.present).length,
+  }));
+
+  // 3. User Roles Distribution
+  const roleData = [
+    { name: 'Genitori', value: users.filter(u => u.role === 'parent').length },
+    { name: 'Animatori', value: users.filter(u => u.role === 'animator').length },
+    { name: 'Admin', value: users.filter(u => u.role === 'admin').length },
+  ];
+
+  // 4. Survey Participation
+  const surveyStats = surveys.map(s => {
+    const resp = responses.filter(r => r.surveyId === s.id && r.participating);
+    return {
+      name: s.title.length > 15 ? s.title.substring(0, 15) + '...' : s.title,
+      partecipanti: resp.length,
+      obiettivo: s.minParticipants || 0
+    };
+  });
+
+  const COLORS = ['#F27D26', '#E4E3E0', '#141414', '#5A5A40'];
+
+  return (
+    <div className="space-y-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Attendance Trend */}
+        <div className="bg-warm-bg/50 p-8 rounded-[2.5rem] border border-warm-border">
+          <h4 className="text-xl font-bold text-warm-text font-serif italic mb-8">Andamento Presenze (Ultimi 7 Giorni)</h4>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={attendanceTrend}>
+                <defs>
+                  <linearGradient id="colorPresenti" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F27D26" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#F27D26" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E4E3E0" vertical={false} />
+                <XAxis dataKey="date" stroke="#8E9299" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="#8E9299" fontSize={10} tickLine={false} axisLine={false} />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#141414', border: 'none', borderRadius: '12px', color: '#fff' }}
+                  itemStyle={{ color: '#F27D26' }}
+                />
+                <Area type="monotone" dataKey="presenti" stroke="#F27D26" strokeWidth={3} fillOpacity={1} fill="url(#colorPresenti)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Registration Status */}
+        <div className="bg-warm-bg/50 p-8 rounded-[2.5rem] border border-warm-border">
+          <h4 className="text-xl font-bold text-warm-text font-serif italic mb-8">Stato Iscrizioni</h4>
+          <div className="h-[300px] w-full flex items-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <RechartsTooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-4 pr-8">
+              {statusData.map((entry, index) => (
+                <div key={entry.name} className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-warm-muted">{entry.name}: {entry.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Survey Participation */}
+        <div className="bg-warm-bg/50 p-8 rounded-[2.5rem] border border-warm-border">
+          <h4 className="text-xl font-bold text-warm-text font-serif italic mb-8">Partecipazione Sondaggi</h4>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={surveyStats} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#E4E3E0" horizontal={false} />
+                <XAxis type="number" stroke="#8E9299" fontSize={10} hide />
+                <YAxis dataKey="name" type="category" stroke="#8E9299" fontSize={10} width={100} tickLine={false} axisLine={false} />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#141414', border: 'none', borderRadius: '12px', color: '#fff' }}
+                />
+                <Bar dataKey="partecipanti" fill="#F27D26" radius={[0, 10, 10, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* User Roles */}
+        <div className="bg-warm-bg/50 p-8 rounded-[2.5rem] border border-warm-border">
+          <h4 className="text-xl font-bold text-warm-text font-serif italic mb-8">Distribuzione Ruoli</h4>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={roleData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E4E3E0" vertical={false} />
+                <XAxis dataKey="name" stroke="#8E9299" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="#8E9299" fontSize={10} tickLine={false} axisLine={false} />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#141414', border: 'none', borderRadius: '12px', color: '#fff' }}
+                />
+                <Bar dataKey="value" fill="#141414" radius={[10, 10, 0, 0]} barSize={40} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AdminNotificationManager: React.FC<{
+  onSend: (data: any) => void;
+  onDelete: (id: string) => void;
+  notifications: Notification[];
+}> = ({ onSend, onDelete, notifications }) => {
+  const [isAdding, setIsAdding] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'info' | 'warning' | 'urgent',
+    targetGroup: 'all' as 'all' | 'parents' | 'animators'
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSend(formData);
+    setFormData({ title: '', message: '', type: 'info', targetGroup: 'all' });
+    setIsAdding(false);
+  };
+
+  return (
+    <div className="space-y-12">
+      <div className="flex justify-between items-center">
+        <h3 className="text-2xl font-bold text-warm-text font-serif italic">Gestione Notifiche Push</h3>
+        <button 
+          onClick={() => setIsAdding(!isAdding)}
+          className="flex items-center gap-2 px-6 py-3 bg-warm-accent text-white rounded-2xl font-bold hover:scale-105 transition-all shadow-lg shadow-warm-accent/20"
+        >
+          {isAdding ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+          {isAdding ? 'Annulla' : 'Invia Notifica'}
+        </button>
+      </div>
+
+      {isAdding && (
+        <motion.form 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onSubmit={handleSubmit}
+          className="bg-warm-bg p-10 rounded-[3rem] border border-warm-border space-y-8"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] ml-2">Titolo</label>
+              <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full px-6 py-4 bg-warm-card border border-warm-border rounded-2xl outline-none focus:ring-4 focus:ring-warm-accent/10 transition-all" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] ml-2">Tipo</label>
+                <select value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value as any })} className="w-full px-6 py-4 bg-warm-card border border-warm-border rounded-2xl outline-none transition-all">
+                  <option value="info">Info</option>
+                  <option value="warning">Avviso</option>
+                  <option value="urgent">Urgente</option>
+                </select>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] ml-2">Destinatari</label>
+                <select value={formData.targetGroup} onChange={e => setFormData({ ...formData, targetGroup: e.target.value as any })} className="w-full px-6 py-4 bg-warm-card border border-warm-border rounded-2xl outline-none transition-all">
+                  <option value="all">Tutti</option>
+                  <option value="parents">Genitori</option>
+                  <option value="animators">Animatori</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em] ml-2">Messaggio</label>
+            <textarea required rows={4} value={formData.message} onChange={e => setFormData({ ...formData, message: e.target.value })} className="w-full px-6 py-4 bg-warm-card border border-warm-border rounded-2xl outline-none focus:ring-4 focus:ring-warm-accent/10 transition-all resize-none" />
+          </div>
+          <button type="submit" className="w-full py-5 bg-warm-accent text-white rounded-2xl font-bold hover:scale-[1.01] transition-all shadow-xl shadow-warm-accent/20 font-serif italic text-xl">
+            Invia a tutti i dispositivi
+          </button>
+        </motion.form>
+      )}
+
+      <div className="grid gap-6">
+        {notifications.map(notif => (
+          <div key={notif.id} className="p-8 bg-warm-card border border-warm-border rounded-[2.5rem] flex items-center justify-between group hover:shadow-xl transition-all">
+            <div className="flex items-center gap-6">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${
+                notif.type === 'urgent' ? 'bg-red-50 text-red-500 border-red-100' : 
+                notif.type === 'warning' ? 'bg-orange-50 text-orange-500 border-orange-100' : 
+                'bg-emerald-50 text-emerald-500 border-emerald-100'
+              }`}>
+                <Bell className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <h4 className="font-bold text-warm-text text-lg">{notif.title}</h4>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-warm-muted bg-warm-bg px-2 py-0.5 rounded-lg border border-warm-border">{notif.targetGroup}</span>
+                </div>
+                <p className="text-warm-muted text-sm font-sans">{notif.message}</p>
+                <p className="text-[9px] font-bold text-warm-muted/50 uppercase tracking-widest mt-2">{new Date(notif.createdAt.toDate()).toLocaleString('it-IT')}</p>
+              </div>
+            </div>
+            <DeleteButton onDelete={() => onDelete(notif.id!)} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const ErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -955,8 +1217,10 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'home' | 'register' | 'admin' | 'legal'>('home');
-  const [adminTab, setAdminTab] = useState<'dashboard' | 'registrations' | 'attendance' | 'surveys' | 'schedule' | 'events' | 'users' | 'announcements' | 'legal'>('dashboard');
+  const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
+  const [notificationReads, setNotificationReads] = useState<NotificationRead[]>([]);
+  const [activeTab, setActiveTab] = useState<'home' | 'register' | 'admin' | 'legal' | 'notifications' | 'statistics'>('home');
+  const [adminTab, setAdminTab] = useState<'dashboard' | 'registrations' | 'attendance' | 'surveys' | 'schedule' | 'events' | 'users' | 'announcements' | 'legal' | 'statistics' | 'notifications'>('dashboard');
   const [userSearch, setUserSearch] = useState('');
   const [events, setEvents] = useState<GrestEvent[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -980,13 +1244,15 @@ export default function App() {
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   interface AdminTabInfo {
-    id: 'dashboard' | 'registrations' | 'attendance' | 'surveys' | 'announcements' | 'schedule' | 'events' | 'users' | 'legal';
+    id: 'dashboard' | 'registrations' | 'attendance' | 'surveys' | 'announcements' | 'schedule' | 'events' | 'users' | 'legal' | 'statistics' | 'notifications';
     label: string;
     icon: React.ReactNode;
   }
 
   const adminTabs: AdminTabInfo[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'statistics', label: 'Statistiche', icon: <TrendingUp className="w-4 h-4" /> },
+    { id: 'notifications', label: 'Notifiche', icon: <Bell className="w-4 h-4" /> },
     { id: 'registrations', label: 'Iscrizioni', icon: <Users className="w-4 h-4" /> },
     { id: 'attendance', label: 'Presenze', icon: <CheckCircle className="w-4 h-4" /> },
     { id: 'surveys', label: 'Sondaggi', icon: <Vote className="w-4 h-4" /> },
@@ -1163,6 +1429,44 @@ export default function App() {
   }, [profile]);
 
   useEffect(() => {
+    if (!user) {
+      setAllNotifications([]);
+      return;
+    }
+    const q = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any as Notification));
+      // Filter client-side based on targetGroup and profile role
+      const filtered = data.filter(n => {
+        if (profile?.role === 'admin') return true;
+        if (n.targetGroup === 'all') return true;
+        if (n.targetGroup === 'parents' && profile?.role === 'parent') return true;
+        if (n.targetGroup === 'animators' && profile?.role === 'animator') return true;
+        return false;
+      });
+      setAllNotifications(filtered);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'notifications');
+    });
+    return () => unsubscribe();
+  }, [user, profile]);
+
+  useEffect(() => {
+    if (!user) {
+      setNotificationReads([]);
+      return;
+    }
+    const q = query(collection(db, 'notificationReads'), where('userUid', '==', user.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NotificationRead));
+      setNotificationReads(data);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'notificationReads');
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
     const q = query(collection(db, 'legalContent'), orderBy('updatedAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as LegalContent));
@@ -1188,6 +1492,14 @@ export default function App() {
     });
     return () => unsubscribe();
   }, [profile]);
+
+  const linkRegistrationToParent = async (registrationId: string, parentUid: string) => {
+    try {
+      await updateDoc(doc(db, 'registrations', registrationId), { parentUid });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `registrations/${registrationId}`);
+    }
+  };
 
   const deleteEntity = async (collectionName: string, id: string) => {
     try {
@@ -1342,11 +1654,31 @@ export default function App() {
     }
   };
 
-  const linkRegistrationToParent = async (regId: string, parentUid: string) => {
+  const markNotificationAsRead = async (notificationId: string) => {
+    if (!user) return;
+    const existing = notificationReads.find(r => r.notificationId === notificationId);
+    if (existing) return;
     try {
-      await updateDoc(doc(db, 'registrations', regId), { parentUid });
+      await addDoc(collection(db, 'notificationReads'), {
+        notificationId,
+        userUid: user.uid,
+        readAt: Timestamp.now()
+      });
     } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `registrations/${regId}`);
+      handleFirestoreError(error, OperationType.CREATE, 'notificationReads');
+    }
+  };
+
+  const sendNotification = async (data: Omit<Notification, 'id' | 'createdAt' | 'senderUid'>) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, 'notifications'), {
+        ...data,
+        senderUid: user.uid,
+        createdAt: Timestamp.now()
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'notifications');
     }
   };
 
@@ -1382,6 +1714,14 @@ export default function App() {
 
               <nav className="hidden md:flex items-center gap-2 bg-warm-card p-1.5 rounded-full border border-warm-border shadow-sm">
                 <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={<Home className="w-4 h-4" />} label="Home" />
+                <NavButton active={activeTab === 'notifications'} onClick={() => setActiveTab('notifications')} icon={
+                  <div className="relative">
+                    <Bell className="w-4 h-4" />
+                    {allNotifications.length > notificationReads.length && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-white" />
+                    )}
+                  </div>
+                } label="Notifiche" />
                 <NavButton active={activeTab === 'register'} onClick={() => setActiveTab('register')} icon={<UserPlus className="w-4 h-4" />} label="Iscriviti" />
                 {user && (
                   <NavButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<UserCircle className="w-4 h-4" />} label="Profilo" />
@@ -1707,6 +2047,55 @@ export default function App() {
               </motion.div>
             )}
 
+            {activeTab === 'notifications' && (
+              <motion.div key="notifications" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-4xl mx-auto space-y-8">
+                <div className="flex items-center justify-between px-2">
+                  <h2 className="text-4xl font-bold text-warm-text font-serif italic">Le Mie Notifiche</h2>
+                  <Bell className="w-8 h-8 text-warm-accent/20" />
+                </div>
+                <div className="grid gap-6">
+                  {allNotifications.map(notif => {
+                    const isRead = notificationReads.some(r => r.notificationId === notif.id);
+                    return (
+                      <motion.div 
+                        key={notif.id}
+                        onViewportEnter={() => !isRead && markNotificationAsRead(notif.id)}
+                        className={`p-8 rounded-[2.5rem] border transition-all duration-500 relative overflow-hidden ${
+                          isRead ? 'bg-warm-card border-warm-border opacity-80' : 'bg-white border-warm-accent/30 shadow-xl shadow-warm-accent/5'
+                        }`}
+                      >
+                        {!isRead && <div className="absolute top-0 left-0 w-1.5 h-full bg-warm-accent" />}
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className={`w-2.5 h-2.5 rounded-full ${
+                            notif.type === 'urgent' ? 'bg-red-500 animate-pulse' : 
+                            notif.type === 'warning' ? 'bg-orange-500' : 
+                            'bg-warm-accent'
+                          }`} />
+                          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-warm-muted">
+                            {notif.type === 'urgent' ? 'Urgente' : notif.type === 'warning' ? 'Avviso' : 'Info'}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-warm-text text-xl mb-3 font-serif leading-tight">{notif.title}</h4>
+                        <p className="text-warm-muted text-base leading-relaxed font-light">{notif.message}</p>
+                        <div className="mt-6 pt-6 border-t border-warm-border/50 flex justify-between items-center">
+                          <span className="text-[10px] font-bold text-warm-muted uppercase tracking-[0.2em]">
+                            {new Date(notif.createdAt.toDate()).toLocaleDateString('it-IT')}
+                          </span>
+                          {isRead ? <CheckCircle className="w-5 h-5 text-emerald-500/30" /> : <Sparkles className="w-5 h-5 text-warm-accent animate-pulse" />}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                  {allNotifications.length === 0 && (
+                    <div className="py-32 text-center bg-warm-card rounded-[3rem] border border-warm-border">
+                      <Bell className="w-16 h-16 text-warm-accent/10 mx-auto mb-6" />
+                      <p className="text-warm-muted font-medium font-serif text-xl">Nessuna notifica per te.</p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
             {activeTab === 'register' && (
               <motion.div key="register" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-2xl mx-auto">
                 <div className="bg-white p-6 md:p-12 rounded-[2.5rem] border border-stone-200 shadow-xl shadow-stone-100/50">
@@ -1893,6 +2282,28 @@ export default function App() {
                         users={allUsers} 
                         surveys={surveys} 
                         responses={allSurveyResponses} 
+                      />
+                    </div>
+                  )}
+
+                  {adminTab === 'statistics' && (
+                    <div className="p-4 md:p-12">
+                      <AdvancedStatistics 
+                        registrations={allRegistrations}
+                        users={allUsers}
+                        attendance={attendance}
+                        surveys={surveys}
+                        responses={allSurveyResponses}
+                      />
+                    </div>
+                  )}
+
+                  {adminTab === 'notifications' && (
+                    <div className="p-4 md:p-12">
+                      <AdminNotificationManager 
+                        onSend={sendNotification}
+                        onDelete={(id) => deleteEntity('notifications', id)}
+                        notifications={allNotifications}
                       />
                     </div>
                   )}
@@ -2368,6 +2779,14 @@ export default function App() {
         <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden w-[95%] max-w-md">
           <div className="bg-warm-card/90 backdrop-blur-2xl border border-warm-border p-2 rounded-[2rem] shadow-2xl flex items-center justify-around gap-1">
             <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={<Home className="w-5 h-5" />} label="Home" />
+            <NavButton active={activeTab === 'notifications'} onClick={() => setActiveTab('notifications')} icon={
+              <div className="relative">
+                <Bell className="w-5 h-5" />
+                {allNotifications.length > notificationReads.length && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-white" />
+                )}
+              </div>
+            } label="Notifiche" />
             <NavButton active={activeTab === 'register'} onClick={() => setActiveTab('register')} icon={<UserPlus className="w-5 h-5" />} label="Iscriviti" />
             {user && <NavButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={<UserCircle className="w-5 h-5" />} label="Profilo" />}
             {profile?.role === 'admin' && <NavButton active={activeTab === 'admin'} onClick={() => setActiveTab('admin')} icon={<Settings className="w-5 h-5" />} label="Admin" />}
