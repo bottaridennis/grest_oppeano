@@ -133,6 +133,33 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "type", "content", "updatedAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System notifications for users",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "warning", "urgent"] },
+        "targetGroup": { "type": "string", "enum": ["all", "parents", "animators"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "senderUid": { "type": "string" }
+      },
+      "required": ["id", "title", "message", "type", "targetGroup", "createdAt", "senderUid"]
+    },
+    "NotificationRead": {
+      "title": "NotificationRead",
+      "description": "Tracking of read notifications",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "notificationId": { "type": "string" },
+        "userUid": { "type": "string" },
+        "readAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "notificationId", "userUid", "readAt"]
     }
   },
   "firestore": {
@@ -171,6 +198,14 @@
     "/legalContent/{contentId}": {
       "schema": "LegalContent",
       "description": "Legal content documents"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Notification documents"
+    },
+    "/notificationReads/{readId}": {
+      "schema": "NotificationRead",
+      "description": "Notification read status documents"
     }
   }
 }
