@@ -90,3 +90,20 @@ export interface Announcement {
   type: 'info' | 'warning' | 'urgent';
   createdAt: any;
 }
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'urgent';
+  targetGroup: 'all' | 'parents' | 'animators';
+  createdAt: any;
+  senderUid: string;
+}
+
+export interface NotificationRead {
+  id: string;
+  notificationId: string;
+  userUid: string;
+  readAt: any;
+}
