@@ -10,16 +10,16 @@ service cloud.firestore {
     // Fields: uid, email, displayName, firstName, lastName, role, isManual, mustChangePassword, phone, createdAt
     //
     // Collection: registrations
-    // Fields: id, parentUid, childName, childSurname, birthDate, allergies, medicalNotes, status, paidGrestFee, createdAt
+    // Fields: id, parentUid, childName, childSurname, birthDate, allergies, medicalNotes, emergencyPhone, status, paidGrestFee, createdAt
     //
     // Collection: events
-    // Fields: id, title, description, date, location, createdAt
+    // Fields: id, title, description, date, time, location, createdAt
     //
     // Collection: attendance
     // Fields: registrationId, date, present, recordedAt
     //
     // Collection: surveys
-    // Fields: id, title, description, deadline, cost, departureTime, returnTime, minParticipants, active, createdAt
+    // Fields: id, title, description, date, deadline, cost, departureTime, returnTime, minParticipants, active, createdAt
     //
     // Collection: surveyResponses
     // Fields: surveyId, parentUid, registrationId, participating, paidTripFee, notes, respondedAt
@@ -86,7 +86,7 @@ service cloud.firestore {
       return hasRequiredFields(['uid', 'role', 'createdAt']) &&
              data.uid is string &&
              data.role in ['admin', 'parent', 'animator'] &&
-             (data.email == null || isValidEmail(data.email)) &&
+             (data.get('email', '') == '' || isValidEmail(data.email)) &&
              data.createdAt is timestamp;
     }
 
@@ -139,26 +139,42 @@ service cloud.firestore {
     match /notificationReads/{readId} {
       allow read: if isAuthenticated() && (request.auth.uid == resource.data.userUid || isAdmin());
       allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userUid && isValidNotificationRead(request.resource.data);
-      allow update: if isAuthenticated() && request.auth.uid == resource.data.userUid && isValidNotificationRead(request.resource.data);
+      allow update: if isAuthenticated() && request.auth.uid == resource.data.userUid && request.auth.uid == request.resource.data.userUid && isValidNotificationRead(request.resource.data);
       allow delete: if isAdmin();
     }
 
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
-                    (request.resource.data.role == 'parent' || isAdmin());
+      // Auto-registrazione come genitore, oppure creazione da parte di un admin.
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) &&
+                    request.resource.data.uid == userId && (
+                      (isOwner(userId) && request.resource.data.role == 'parent') || isAdmin()
+                    );
+      // Il proprietario può aggiornare i propri dati ma non il ruolo né i flag gestiti dall'admin.
       allow update: if isAuthenticated() && (
-        (isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role) || 
+        (isOwner(userId) && isValidUser(request.resource.data) &&
+         request.resource.data.role == resource.data.role &&
+         request.resource.data.get('isManual', false) == resource.data.get('isManual', false)) ||
         isAdmin()
       );
+      allow delete: if isAdmin() && !isOwner(userId);
     }
 
     match /registrations/{regId} {
       allow read: if isAuthenticated() && (request.auth.uid == resource.data.parentUid || isAdmin() || isAnimator());
-      allow create: if isAuthenticated() && (request.auth.uid == request.resource.data.parentUid || isAdmin()) && isValidRegistration(request.resource.data);
+      allow create: if isAuthenticated() && isValidRegistration(request.resource.data) && (
+        (request.auth.uid == request.resource.data.parentUid &&
+         request.resource.data.status == 'pending' &&
+         request.resource.data.get('paidGrestFee', false) == false) ||
+        isAdmin()
+      );
+      // Il genitore può modificare i dati del figlio e ritirare l'iscrizione,
+      // ma non confermarla, cambiare il pagamento o trasferirla a un altro account.
       allow update: if isAuthenticated() && (
-        (request.auth.uid == resource.data.parentUid && isValidRegistration(request.resource.data) && 
-         request.resource.data.status == resource.data.status && request.resource.data.paidGrestFee == resource.data.paidGrestFee) || 
+        (request.auth.uid == resource.data.parentUid && isValidRegistration(request.resource.data) &&
+         request.resource.data.parentUid == resource.data.parentUid &&
+         (request.resource.data.status == resource.data.status || request.resource.data.status == 'cancelled') &&
+         request.resource.data.get('paidGrestFee', false) == resource.data.get('paidGrestFee', false)) ||
         isAdmin()
       );
       allow delete: if isAdmin();
@@ -171,7 +187,12 @@ service cloud.firestore {
 
     match /attendance/{attId} {
       allow read: if isAdmin() || isAnimator();
-      allow write: if isAdmin() || isAnimator();
+      allow create, update: if (isAdmin() || isAnimator()) &&
+                            hasRequiredFields(['registrationId', 'date', 'present', 'recordedAt']) &&
+                            request.resource.data.registrationId is string &&
+                            request.resource.data.date is string &&
+                            request.resource.data.present is bool;
+      allow delete: if isAdmin();
     }
 
     match /surveys/{surveyId} {
@@ -181,10 +202,15 @@ service cloud.firestore {
 
     match /surveyResponses/{respId} {
       allow read: if isAuthenticated() && (request.auth.uid == resource.data.parentUid || isAdmin());
-      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.parentUid && isValidSurveyResponse(request.resource.data);
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.parentUid &&
+                    isValidSurveyResponse(request.resource.data) &&
+                    request.resource.data.get('paidTripFee', false) == false &&
+                    get(/databases/$(database)/documents/registrations/$(request.resource.data.registrationId)).data.parentUid == request.auth.uid;
       allow update: if isAuthenticated() && (
-        (request.auth.uid == resource.data.parentUid && isValidSurveyResponse(request.resource.data) && 
-         request.resource.data.paidTripFee == resource.data.paidTripFee) || 
+        (request.auth.uid == resource.data.parentUid && isValidSurveyResponse(request.resource.data) &&
+         request.resource.data.parentUid == resource.data.parentUid &&
+         request.resource.data.registrationId == resource.data.registrationId &&
+         request.resource.data.get('paidTripFee', false) == resource.data.get('paidTripFee', false)) ||
         isAdmin()
       );
       allow delete: if isAdmin();
@@ -203,10 +229,6 @@ service cloud.firestore {
     match /legalContent/{contentId} {
       allow read: if true; // Publicly readable
       allow write: if isAdmin();
-    }
-
-    match /test/connection {
-      allow read: if true;
     }
 
     // Default deny
