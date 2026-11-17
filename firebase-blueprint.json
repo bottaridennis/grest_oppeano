@@ -5,161 +5,429 @@
       "description": "User profile information",
       "type": "object",
       "properties": {
-        "uid": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
-        "displayName": { "type": "string" },
-        "firstName": { "type": "string" },
-        "lastName": { "type": "string" },
-        "role": { "type": "string", "enum": ["admin", "parent", "animator"] },
-        "isManual": { "type": "boolean" },
-        "mustChangePassword": { "type": "boolean" },
-        "phone": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "uid": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "admin",
+            "parent",
+            "animator"
+          ]
+        },
+        "isManual": {
+          "type": "boolean"
+        },
+        "mustChangePassword": {
+          "type": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["uid", "role", "createdAt"]
+      "required": [
+        "uid",
+        "role",
+        "createdAt"
+      ]
     },
     "Registration": {
       "title": "Registration",
       "description": "Child registration for Grest",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "parentUid": { "type": "string" },
-        "childName": { "type": "string" },
-        "childSurname": { "type": "string" },
-        "birthDate": { "type": "string", "format": "date" },
-        "allergies": { "type": "array", "items": { "type": "string" } },
-        "medicalNotes": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
-        "paidGrestFee": { "type": "boolean" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "parentUid": {
+          "type": "string"
+        },
+        "childName": {
+          "type": "string"
+        },
+        "childSurname": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "allergies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "medicalNotes": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "confirmed",
+            "cancelled"
+          ]
+        },
+        "paidGrestFee": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "emergencyPhone": {
+          "type": "string"
+        }
       },
-      "required": ["id", "parentUid", "childName", "childSurname", "birthDate", "status", "createdAt"]
+      "required": [
+        "id",
+        "parentUid",
+        "childName",
+        "childSurname",
+        "birthDate",
+        "status",
+        "createdAt"
+      ]
     },
     "GrestEvent": {
       "title": "GrestEvent",
       "description": "Special events during Grest",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "description": { "type": "string" },
-        "date": { "type": "string", "format": "date" },
-        "location": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "location": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "time": {
+          "type": "string"
+        }
       },
-      "required": ["id", "title", "date", "createdAt"]
+      "required": [
+        "id",
+        "title",
+        "date",
+        "createdAt"
+      ]
     },
     "Attendance": {
       "title": "Attendance",
       "description": "Daily attendance records",
       "type": "object",
       "properties": {
-        "registrationId": { "type": "string" },
-        "date": { "type": "string", "format": "date" },
-        "present": { "type": "boolean" },
-        "recordedAt": { "type": "string", "format": "date-time" }
+        "registrationId": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "present": {
+          "type": "boolean"
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["registrationId", "date", "present", "recordedAt"]
+      "required": [
+        "registrationId",
+        "date",
+        "present",
+        "recordedAt"
+      ]
     },
     "Survey": {
       "title": "Survey",
       "description": "Surveys or trip registrations",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "description": { "type": "string" },
-        "deadline": { "type": "string", "format": "date" },
-        "cost": { "type": "number" },
-        "departureTime": { "type": "string" },
-        "returnTime": { "type": "string" },
-        "minParticipants": { "type": "integer" },
-        "active": { "type": "boolean" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date"
+        },
+        "cost": {
+          "type": "number"
+        },
+        "departureTime": {
+          "type": "string"
+        },
+        "returnTime": {
+          "type": "string"
+        },
+        "minParticipants": {
+          "type": "integer"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        }
       },
-      "required": ["id", "title", "active", "createdAt"]
+      "required": [
+        "id",
+        "title",
+        "active",
+        "createdAt"
+      ]
     },
     "SurveyResponse": {
       "title": "SurveyResponse",
       "description": "Parent responses to surveys",
       "type": "object",
       "properties": {
-        "surveyId": { "type": "string" },
-        "parentUid": { "type": "string" },
-        "registrationId": { "type": "string" },
-        "participating": { "type": "boolean" },
-        "paidTripFee": { "type": "boolean" },
-        "notes": { "type": "string" },
-        "respondedAt": { "type": "string", "format": "date-time" }
+        "surveyId": {
+          "type": "string"
+        },
+        "parentUid": {
+          "type": "string"
+        },
+        "registrationId": {
+          "type": "string"
+        },
+        "participating": {
+          "type": "boolean"
+        },
+        "paidTripFee": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "respondedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["surveyId", "parentUid", "registrationId", "participating", "respondedAt"]
+      "required": [
+        "surveyId",
+        "parentUid",
+        "registrationId",
+        "participating",
+        "respondedAt"
+      ]
     },
     "ScheduleItem": {
       "title": "ScheduleItem",
       "description": "Daily schedule items",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "time": { "type": "string" },
-        "activity": { "type": "string" },
-        "description": { "type": "string" },
-        "day": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string"
+        },
+        "activity": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "day": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["id", "time", "activity", "day", "createdAt"]
+      "required": [
+        "id",
+        "time",
+        "activity",
+        "day",
+        "createdAt"
+      ]
     },
     "Announcement": {
       "title": "Announcement",
       "description": "Public announcements",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "content": { "type": "string" },
-        "type": { "type": "string", "enum": ["info", "warning", "urgent"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "info",
+            "warning",
+            "urgent"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["id", "title", "content", "type", "createdAt"]
+      "required": [
+        "id",
+        "title",
+        "content",
+        "type",
+        "createdAt"
+      ]
     },
     "LegalContent": {
       "title": "LegalContent",
       "description": "Privacy policy and terms",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "type": { "type": "string", "enum": ["privacy", "cookies", "terms"] },
-        "content": { "type": "string" },
-        "updatedAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "privacy",
+            "cookies",
+            "terms"
+          ]
+        },
+        "content": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["id", "type", "content", "updatedAt"]
+      "required": [
+        "id",
+        "type",
+        "content",
+        "updatedAt"
+      ]
     },
     "Notification": {
       "title": "Notification",
       "description": "System notifications for users",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "message": { "type": "string" },
-        "type": { "type": "string", "enum": ["info", "warning", "urgent"] },
-        "targetGroup": { "type": "string", "enum": ["all", "parents", "animators"] },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "senderUid": { "type": "string" }
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "info",
+            "warning",
+            "urgent"
+          ]
+        },
+        "targetGroup": {
+          "type": "string",
+          "enum": [
+            "all",
+            "parents",
+            "animators"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "senderUid": {
+          "type": "string"
+        }
       },
-      "required": ["id", "title", "message", "type", "targetGroup", "createdAt", "senderUid"]
+      "required": [
+        "id",
+        "title",
+        "message",
+        "type",
+        "targetGroup",
+        "createdAt",
+        "senderUid"
+      ]
     },
     "NotificationRead": {
       "title": "NotificationRead",
       "description": "Tracking of read notifications",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "notificationId": { "type": "string" },
-        "userUid": { "type": "string" },
-        "readAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "notificationId": {
+          "type": "string"
+        },
+        "userUid": {
+          "type": "string"
+        },
+        "readAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["id", "notificationId", "userUid", "readAt"]
+      "required": [
+        "id",
+        "notificationId",
+        "userUid",
+        "readAt"
+      ]
     }
   },
   "firestore": {

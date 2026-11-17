@@ -2,45 +2,61 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
-import {defineConfig, loadEnv} from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 
-export default defineConfig(({mode}) => {
-  const env = loadEnv(mode, '.', '');
-  
-  // Load local firebase config if it exists (for AI Studio preview)
-  let localFirebaseConfig: any = {};
+const FIREBASE_KEYS = {
+  VITE_FIREBASE_API_KEY: 'apiKey',
+  VITE_FIREBASE_AUTH_DOMAIN: 'authDomain',
+  VITE_FIREBASE_PROJECT_ID: 'projectId',
+  VITE_FIREBASE_STORAGE_BUCKET: 'storageBucket',
+  VITE_FIREBASE_MESSAGING_SENDER_ID: 'messagingSenderId',
+  VITE_FIREBASE_APP_ID: 'appId',
+  VITE_FIREBASE_DATABASE_ID: 'firestoreDatabaseId',
+  VITE_FIREBASE_MEASUREMENT_ID: 'measurementId',
+} as const;
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+
+  // In locale (es. AI Studio) la configurazione può arrivare da firebase-applet-config.json.
+  let localConfig: Record<string, string> = {};
   const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
   if (fs.existsSync(configPath)) {
     try {
-      localFirebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      console.log('Loaded localFirebaseConfig:', JSON.stringify(localFirebaseConfig, null, 2));
+      localConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
     } catch (e) {
-      console.error('Error parsing firebase-applet-config.json', e);
+      console.error('firebase-applet-config.json non valido', e);
     }
   }
 
+  const define = Object.fromEntries(
+    Object.entries(FIREBASE_KEYS).map(([envKey, jsonKey]) => [
+      `import.meta.env.${envKey}`,
+      JSON.stringify(env[envKey] || localConfig[jsonKey] || ''),
+    ]),
+  );
+
+  define['import.meta.env.VITE_USE_EMULATORS'] = JSON.stringify(env.VITE_USE_EMULATORS || '');
+
   return {
-    base: '/grest_oppeano/', 
+    base: '/grest_oppeano/',
     plugins: [react(), tailwindcss()],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(env.VITE_FIREBASE_API_KEY || localFirebaseConfig.apiKey || ''),
-      'import.meta.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(env.VITE_FIREBASE_AUTH_DOMAIN || localFirebaseConfig.authDomain || ''),
-      'import.meta.env.VITE_FIREBASE_PROJECT_ID': JSON.stringify(env.VITE_FIREBASE_PROJECT_ID || localFirebaseConfig.projectId || ''),
-      'import.meta.env.VITE_FIREBASE_STORAGE_BUCKET': JSON.stringify(env.VITE_FIREBASE_STORAGE_BUCKET || localFirebaseConfig.storageBucket || ''),
-      'import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(env.VITE_FIREBASE_MESSAGING_SENDER_ID || localFirebaseConfig.messagingSenderId || ''),
-      'import.meta.env.VITE_FIREBASE_APP_ID': JSON.stringify(env.VITE_FIREBASE_APP_ID || localFirebaseConfig.appId || ''),
-      'import.meta.env.VITE_FIREBASE_DATABASE_ID': JSON.stringify(env.VITE_FIREBASE_DATABASE_ID || localFirebaseConfig.firestoreDatabaseId || ''),
-      'import.meta.env.VITE_FIREBASE_MEASUREMENT_ID': JSON.stringify(env.VITE_FIREBASE_MEASUREMENT_ID || localFirebaseConfig.measurementId || ''),
-    },
+    define,
     resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
+      alias: { '@': path.resolve(__dirname, '.') },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+            charts: ['recharts'],
+          },
+        },
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+      // In AI Studio l'HMR viene disattivato tramite DISABLE_HMR.
       hmr: process.env.DISABLE_HMR !== 'true',
     },
   };

@@ -1,4 +1,10 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export type UserRole = 'admin' | 'parent' | 'animator';
+export type RegistrationStatus = 'pending' | 'confirmed' | 'cancelled';
+export type MessageType = 'info' | 'warning' | 'urgent';
+export type TargetGroup = 'all' | 'parents' | 'animators';
+export type LegalType = 'privacy' | 'cookies' | 'terms';
 
 export interface UserProfile {
   uid: string;
@@ -10,14 +16,14 @@ export interface UserProfile {
   isManual?: boolean;
   mustChangePassword?: boolean;
   phone?: string;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 export interface LegalContent {
   id: string;
-  type: 'privacy' | 'cookies' | 'terms';
+  type: LegalType;
   content: string;
-  updatedAt: any;
+  updatedAt: Timestamp;
 }
 
 export interface Registration {
@@ -28,9 +34,10 @@ export interface Registration {
   birthDate: string;
   allergies?: string[];
   medicalNotes?: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  emergencyPhone?: string;
+  status: RegistrationStatus;
   paidGrestFee?: boolean;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 export interface GrestEvent {
@@ -38,40 +45,42 @@ export interface GrestEvent {
   title: string;
   description?: string;
   date: string;
+  time?: string;
   location?: string;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 export interface Attendance {
-  id?: string;
+  id: string;
   registrationId: string;
   date: string;
   present: boolean;
-  recordedAt: any;
+  recordedAt: Timestamp;
 }
 
 export interface Survey {
   id: string;
   title: string;
   description?: string;
-  deadline?: string;
-  cost?: number;
+  deadline?: string | null;
+  date?: string | null;
+  cost?: number | null;
   departureTime?: string;
   returnTime?: string;
-  minParticipants?: number;
+  minParticipants?: number | null;
   active: boolean;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 export interface SurveyResponse {
-  id?: string;
+  id: string;
   surveyId: string;
   parentUid: string;
   registrationId: string;
   participating: boolean;
   paidTripFee?: boolean;
   notes?: string;
-  respondedAt: any;
+  respondedAt: Timestamp;
 }
 
 export interface ScheduleItem {
@@ -80,24 +89,24 @@ export interface ScheduleItem {
   activity: string;
   description?: string;
   day: string;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 export interface Announcement {
   id: string;
   title: string;
   content: string;
-  type: 'info' | 'warning' | 'urgent';
-  createdAt: any;
+  type: MessageType;
+  createdAt: Timestamp;
 }
 
 export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'warning' | 'urgent';
-  targetGroup: 'all' | 'parents' | 'animators';
-  createdAt: any;
+  type: MessageType;
+  targetGroup: TargetGroup;
+  createdAt: Timestamp;
   senderUid: string;
 }
 
@@ -105,5 +114,5 @@ export interface NotificationRead {
   id: string;
   notificationId: string;
   userUid: string;
-  readAt: any;
+  readAt: Timestamp;
 }

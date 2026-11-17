@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+firebase-applet-config.json
+*.log
+.DS_Store
